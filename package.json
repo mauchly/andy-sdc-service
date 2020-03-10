@@ -7,7 +7,10 @@
   "engines": {
     "node": ">=6.13.0"
   },
-  "scripts": {},
+  "scripts": {
+    "react-dev": "webpack -d --watch",
+    "server-dev": "nodemon server/index.js"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "mongodb": "^3.5.4",
@@ -16,6 +19,11 @@
     "react-dom": "^16.13.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "babel-loader": "^8.0.6",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor",
     "webpack": "^4.42.0"
   }
