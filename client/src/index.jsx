@@ -13,6 +13,20 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    $.ajax({
+      type: 'GET',
+      url: "http://127.0.0.1:3004/onload",
+      success: (results) => {
+        this.setState(() => ({reviews: results}));
+      },
+      error: () => {
+        console.log('error in onload API call');
+      }
+    });
+  }
+
+
 render() {
   return (<div>
     <h1>AirBnB Reviews</h1>
