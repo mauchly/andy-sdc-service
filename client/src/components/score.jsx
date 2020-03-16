@@ -33,7 +33,7 @@ class Score extends React.Component {
 
   render() {
     return (<div>
-      {(this.score(this.props.reviews)).toFixed(1)}
+      Score: {(this.score(this.props.reviews)).toFixed(1)}
     </div>)
   }
 }
