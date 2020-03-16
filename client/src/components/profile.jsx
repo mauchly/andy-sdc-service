@@ -8,7 +8,9 @@ class Profile extends React.Component {
 
   render() {
     return (<div>
-      Profile Text and Avatar
+      {this.props.reviews.date}
+      {this.props.reviews.username}
+      {this.props.reviews.text}
     </div>)
   }
 }

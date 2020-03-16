@@ -13,10 +13,10 @@ class Score extends React.Component {
     let finalScore = 0;
     let helperScore = 0;
     let reviews = value[0].reviews;
-    console.log('value of reviews', reviews.length);
+    // console.log('value of reviews', reviews.length);
     for (let i = 0; i < reviews.length; i++) {
       let scores = reviews[i].scores[0];
-      console.log(scores);
+      // console.log(scores);
 
       helperScore += +scores.cleanliness;
       helperScore += +scores.communication;

@@ -10,8 +10,8 @@ class Review extends React.Component {
 
   render() {
     return (<div>
-      <Profile />
-      <ReviewText />
+      <Profile reviews={this.props.reviews}/>
+      <ReviewText reviews={this.props.reviews}/>
     </div>)
   }
 }
