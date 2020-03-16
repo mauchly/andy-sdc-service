@@ -29,6 +29,7 @@ while (nameIndex < 100) {
         username: faker.name.findName(),
         date: faker.date.month() + ' ' + randYear(),
         text: faker.lorem.paragraph(),
+        avatar: faker.image.avatar(),
         scores: [
           {
             cleanliness: floatNum(),

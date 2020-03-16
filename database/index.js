@@ -16,6 +16,7 @@ let reviewsSchema = mongoose.Schema({
       username: String,
       date: String,
       text: String,
+      avatar: String,
       scores: [
         {
           cleanliness: Number,

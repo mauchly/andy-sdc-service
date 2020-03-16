@@ -1,5 +1,10 @@
 import React from 'react';
 
+//Circular
+let divStyle = {
+  'fontFamily': 'Roboto'
+}
+
 class Score extends React.Component {
   constructor(props) {
     super(props)
@@ -31,9 +36,17 @@ class Score extends React.Component {
     return (finalScore / reviews.length);
   }
 
+  totalReviews(value) {
+    if (value.length === 0) {
+      return 0;
+    } else {
+      return value[0].reviews.length;
+    }
+  }
+
   render() {
-    return (<div>
-      Score: {(this.score(this.props.reviews)).toFixed(1)}
+    return (<div style={divStyle}>
+      Score: {(this.score(this.props.reviews)).toFixed(2)}    {this.totalReviews(this.props.reviews)} reviews
     </div>)
   }
 }

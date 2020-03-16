@@ -8,9 +8,9 @@ class Profile extends React.Component {
 
   render() {
     return (<div>
+      <img src={this.props.reviews.avatar}></img>
       {this.props.reviews.date}
       {this.props.reviews.username}
-      {this.props.reviews.text}
     </div>)
   }
 }
