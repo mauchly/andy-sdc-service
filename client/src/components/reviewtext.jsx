@@ -8,7 +8,7 @@ class ReviewText extends React.Component {
 
   render() {
     return (<div>
-      AirBnB Review Text
+      {this.props.reviews.text}
     </div>)
   }
 }
