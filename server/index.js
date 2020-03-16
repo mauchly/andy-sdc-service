@@ -5,6 +5,8 @@ const { Reviews } = require('../database/index');
 let app = express();
 
 app.use(express.static('public'));
+app.use(express.text());
+app.use(express.urlencoded());
 
 app.get('/', (req, res) => {
   console.log('initial GET request');
@@ -13,7 +15,7 @@ app.get('/', (req, res) => {
 
 app.get('/onload', (req, res) => {
   console.log('onload GET request');
-  Reviews.find({}, (err, result) => {
+  Reviews.find({id: 10001}, (err, result) => {
     if (err) {
       console.log('error in Reviews.find', err);
       res.sendStatus(404);

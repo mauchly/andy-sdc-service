@@ -9,7 +9,9 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      reviews: []
+      id: 10001,
+      reviews: [],
+      dataLoaded: false,
     }
   }
 
@@ -26,13 +28,34 @@ class App extends React.Component {
     });
   }
 
+  // componentDidUpdate() {
+  //   this.isLoaded();
+  // }
+
+  // handleChange(e) {
+  //   e.preventDefault();
+  //   let value = e.target.value;
+  //   this.setState(() => ({id: value}));
+  // }
+
+  // isLoaded() {
+  //   if (this.state.isLoaded === false && this.state.reviews !== []) {
+  //     this.setState(() => ({dataLoaded: true}));
+  //   }
+  // }
+
 
 render() {
   return (<div>
     <h1>AirBnB Reviews</h1>
-    <Score />
-    <Ratings />
-    <Reviews />
+    {/* <select onChange={(e) => this.handleChange(e)}>
+      {this.state.dataLoaded === true ? this.state.reviews.map((item, index) => {
+        <option key={index}>Item: {item.id}</option>
+      }): <option>Loading...</option>}
+    </select> */}
+    <Score reviews={this.state.reviews}/>
+    <Ratings reviews={this.state.reviews} />
+    <Reviews reviews={this.state.reviews}/>
   </div>)
 }
 }
