@@ -2,6 +2,10 @@ import React from 'react';
 import ReviewText from './reviewtext.jsx';
 import Profile from './profile.jsx';
 
+let divStyle = {
+  'fontFamily': 'Roboto',
+}
+
 class Review extends React.Component {
   constructor(props) {
     super(props)
@@ -9,9 +13,11 @@ class Review extends React.Component {
   }
 
   render() {
-    return (<div>
-      <Profile reviews={this.props.reviews}/>
-      <ReviewText reviews={this.props.reviews}/>
+    return (<div style={divStyle}>
+      <div><Profile reviews={this.props.reviews}/>
+      <br></br>
+      <ReviewText reviews={this.props.reviews}/></div>
+      <br></br>
     </div>)
   }
 }

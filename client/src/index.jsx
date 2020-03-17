@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Score from './components/score.jsx';
 import Ratings from './components/ratings.jsx';
-import Review from './components/review.jsx';
+import Reviews from './components/reviews.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -56,10 +56,7 @@ render() {
     <br></br>
     <Ratings reviews={this.state.reviews} />
     <br></br>
-    {this.state.reviews.length > 0 &&
-      this.state.reviews[0].reviews.map((item, index) => {
-        return <Review key={index} reviews={item} />
-      })}
+    <Reviews reviews={this.state.reviews} />
   </div>)
 }
 }

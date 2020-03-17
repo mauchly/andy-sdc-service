@@ -45,7 +45,7 @@ class Score extends React.Component {
 
   render() {
     return (<div style={divStyle}>
-      Score: {(this.score(this.props.reviews)).toFixed(2)}    {this.totalReviews(this.props.reviews)} reviews
+      ★ {(this.score(this.props.reviews)).toFixed(2)}    {this.totalReviews(this.props.reviews)} reviews
     </div>)
   }
 }
