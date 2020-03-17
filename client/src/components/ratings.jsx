@@ -1,5 +1,12 @@
 import React from 'react';
 
+let divStyle = {
+  'fontFamily': 'Roboto',
+  'display': 'grid',
+  'gridTemplateColumns': '1fr 1fr',
+  'gridTemplateRows': '1fr 1fr 1fr'
+}
+
 class Ratings extends React.Component {
   constructor(props) {
     super(props)
@@ -22,13 +29,13 @@ class Ratings extends React.Component {
   }
 
   render() {
-    return (<div>
-      Cleanliness: {(this.attrScore(this.props.reviews, 'cleanliness')).toFixed(1)}
-      Communication: {(this.attrScore(this.props.reviews, 'communication')).toFixed(1)}
-      Check-In: {(this.attrScore(this.props.reviews, 'checkin')).toFixed(1)}
-      Accuracy: {(this.attrScore(this.props.reviews, 'accuracy')).toFixed(1)}
-      Location: {(this.attrScore(this.props.reviews, 'location')).toFixed(1)}
-      Value: {(this.attrScore(this.props.reviews, 'value')).toFixed(1)}
+    return (<div style={divStyle}>
+      <div>Cleanliness: {(this.attrScore(this.props.reviews, 'cleanliness')).toFixed(1)}</div>
+      <div>Accuracy: {(this.attrScore(this.props.reviews, 'accuracy')).toFixed(1)}</div>
+      <div>Communication: {(this.attrScore(this.props.reviews, 'communication')).toFixed(1)}</div>
+      <div>Location: {(this.attrScore(this.props.reviews, 'location')).toFixed(1)}</div>
+      <div>Check-In: {(this.attrScore(this.props.reviews, 'checkin')).toFixed(1)}</div>
+      <div>Value: {(this.attrScore(this.props.reviews, 'value')).toFixed(1)}</div>
     </div>)
   }
 }

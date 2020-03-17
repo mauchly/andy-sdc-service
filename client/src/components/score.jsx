@@ -1,6 +1,5 @@
 import React from 'react';
 
-//Circular
 let divStyle = {
   'fontFamily': 'Roboto'
 }

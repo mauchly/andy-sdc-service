@@ -47,14 +47,15 @@ class App extends React.Component {
 
 render() {
   return (<div>
-    <h1>AirBnB Reviews</h1>
     {/* <select onChange={(e) => this.handleChange(e)}>
       {this.state.dataLoaded === true ? this.state.reviews.map((item, index) => {
         <option key={index}>Item: {item.id}</option>
       }): <option>Loading...</option>}
     </select> */}
     <Score reviews={this.state.reviews} />
+    <br></br>
     <Ratings reviews={this.state.reviews} />
+    <br></br>
     {this.state.reviews.length > 0 &&
       this.state.reviews[0].reviews.map((item, index) => {
         return <Review key={index} reviews={item} />
