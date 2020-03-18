@@ -25,6 +25,37 @@ app.get('/onload', (req, res) => {
   })
 });
 
+app.get('/averageScore', (req, res) => {
+  Reviews.find({id: 10001}, (err, result) => {
+    if (err) {
+      console.log('error in averageScore', err);
+      res.sendStatus(404);
+    } else {
+      if (result.length === 0) {
+        return 0;
+      }
+      let finalScore = 0;
+      let helperScore = 0;
+      let reviews = result[0].reviews;
+      // console.log('value of reviews', reviews.length);
+      for (let i = 0; i < reviews.length; i++) {
+        let scores = reviews[i].scores[0];
+        // console.log(scores);
+
+        helperScore += +scores.cleanliness;
+        helperScore += +scores.communication;
+        helperScore += +scores.checkin;
+        helperScore += +scores.accuracy;
+        helperScore += +scores.location;
+        helperScore += +scores.value;
+
+        finalScore += (helperScore / 6);
+        helperScore = 0;
+      }
+      res.end((finalScore / reviews.length).toFixed(2).toString());
+    }
+  })
+})
 
 app.listen(3004, () => {
   console.log('Express server for REVIEWS listening on port 3004');
