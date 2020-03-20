@@ -16,11 +16,21 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    let url = window.location.href;
+    let listingId;
+    if (url.split.length) {
+      listingId = url.split('/').pop();
+    } else {
+      listingId = '10001';
+    }
     $.ajax({
       type: 'GET',
-      url: "http://127.0.0.1:3004/onload",
+      url: "http://127.0.0.1:3004/listing",
+      data: {data: listingId},
+      dataType: 'text',
       success: (results) => {
-        this.setState(() => ({reviews: results}));
+        let state = JSON.parse(results);
+        this.setState(() => ({reviews: state}));
       },
       error: () => {
         console.log('error in onload API call');
