@@ -8,18 +8,6 @@ app.use(express.static('public'));
 app.use(express.text());
 app.use(express.urlencoded());
 
-// app.get('/onload', (req, res) => {
-//   console.log('onload GET request');
-//   Reviews.find({id: 10001}, (err, result) => {
-//     if (err) {
-//       console.log('error in Reviews.find', err);
-//       res.sendStatus(404);
-//     } else {
-//       res.send(result);
-//     }
-//   })
-// });
-
 app.get('/averageScore:id', (req, res) => {
   console.log(req);
   let listId = req.params.id;
@@ -56,7 +44,7 @@ app.get('/averageScore:id', (req, res) => {
 
 app.get('/listing', (req, res) => {
   console.log('listing', req.query.data);
-  let listId = req.query.data;
+  let listId = req.query.data || 10001;
   Reviews.find({id: listId}, (err, result) => {
     if (err) {
       console.log('error in Reviews.find', err);
