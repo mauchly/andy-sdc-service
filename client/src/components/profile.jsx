@@ -14,6 +14,11 @@ let imgStyle = {
   'width': '50px'
 }
 
+let dateStyle = {
+  'color': 'grey',
+  'fontSize': '14px'
+}
+
 class Profile extends React.Component {
   constructor(props) {
     super(props)
@@ -23,9 +28,9 @@ class Profile extends React.Component {
   render() {
     return (<div style={divStyle}>
       <img src={this.props.reviews.avatar} style={imgStyle}></img>
-      <div>{this.props.reviews.username}
+      <div><b>{this.props.reviews.username.split(' ')[0]}</b>
       <br></br>
-      {this.props.reviews.date}</div>
+      <div style={dateStyle}>{this.props.reviews.date}</div></div>
     </div>)
   }
 }
