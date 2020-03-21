@@ -1,7 +1,17 @@
 import React from 'react';
+import star from '!file-loader!../../../airbnb_star.png';
 
 let divStyle = {
-  'fontFamily': 'Roboto'
+  'fontFamily': 'Roboto',
+  'fontSize': '18px',
+  'fontWeight': 'bold'
+}
+
+let imgStyle = {
+  'width': '23px',
+  'height': '23px',
+  'position': 'relative',
+  'top': '4px'
 }
 
 class Score extends React.Component {
@@ -45,9 +55,11 @@ class Score extends React.Component {
 
   render() {
     return (<div style={divStyle}>
-      ★ {(this.score(this.props.reviews)).toFixed(2)}    {this.totalReviews(this.props.reviews)} reviews
+      <img src={star} alt='Star' style={imgStyle} /> {(this.score(this.props.reviews)).toFixed(2)}    ({this.totalReviews(this.props.reviews)} reviews)
     </div>)
   }
 }
+
+<img src={star} alt='Star' />
 
 export default Score;

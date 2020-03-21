@@ -5,7 +5,7 @@ let divStyle = {
   'fontFamily': 'Roboto',
   'display': 'grid',
   'gridTemplateColumns': '1fr 1fr',
-  'gridTemplateRows': '1fr'
+  'gridTemplateRows': '1fr',
 }
 
 class Reviews extends React.Component {

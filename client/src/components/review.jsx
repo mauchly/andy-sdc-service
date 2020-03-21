@@ -4,6 +4,9 @@ import Profile from './profile.jsx';
 
 let divStyle = {
   'fontFamily': 'Roboto',
+  'padding': '20px',
+  'position': 'relative',
+  'right': '10px'
 }
 
 class Review extends React.Component {
