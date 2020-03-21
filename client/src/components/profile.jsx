@@ -10,13 +10,19 @@ let divStyle = {
 
 let imgStyle = {
   'borderRadius': '50%',
-  'height': '50px',
-  'width': '50px'
+  'height': '60px',
+  'width': '60px'
 }
 
 let dateStyle = {
   'color': 'grey',
   'fontSize': '14px'
+}
+
+let textStyle = {
+  'position': 'relative',
+  'top': '14px',
+  'lineHeight': '1.3'
 }
 
 class Profile extends React.Component {
@@ -28,7 +34,7 @@ class Profile extends React.Component {
   render() {
     return (<div style={divStyle}>
       <img src={this.props.reviews.avatar} style={imgStyle}></img>
-      <div><b>{this.props.reviews.username.split(' ')[0]}</b>
+      <div style={textStyle}><b>{this.props.reviews.username.split(' ')[0]}</b>
       <br></br>
       <div style={dateStyle}>{this.props.reviews.date}</div></div>
     </div>)

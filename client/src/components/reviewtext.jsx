@@ -1,5 +1,9 @@
 import React from 'react';
 
+let textStyle = {
+  'lineHeight': '1.5'
+}
+
 class ReviewText extends React.Component {
   constructor(props) {
     super(props)
@@ -7,7 +11,7 @@ class ReviewText extends React.Component {
   }
 
   render() {
-    return (<div>
+    return (<div style={textStyle}>
       {this.props.reviews.text}
     </div>)
   }
