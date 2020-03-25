@@ -37,5 +37,11 @@
     "jest-cli": "^25.1.0",
     "url-loader": "^4.0.0",
     "webpack": "^4.42.0"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
   }
 }
