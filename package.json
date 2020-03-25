@@ -10,7 +10,8 @@
   "scripts": {
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon server/index.js",
-    "seed": "node ./database/seed.js"
+    "seed": "node ./database/seed.js",
+    "test": "jest"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -32,6 +33,8 @@
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor",
     "file-loader": "^6.0.0",
     "image-webpack-loader": "^6.0.0",
+    "jest": "^25.1.0",
+    "jest-cli": "^25.1.0",
     "url-loader": "^4.0.0",
     "webpack": "^4.42.0"
   }
