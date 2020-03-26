@@ -20,6 +20,7 @@ class Score extends React.Component {
 
   }
 
+  //get Main Rating Score for listing
   score(value) {
     if (value.length === 0) {
       return 0;
@@ -27,10 +28,8 @@ class Score extends React.Component {
     let finalScore = 0;
     let helperScore = 0;
     let reviews = value[0].reviews;
-    // console.log('value of reviews', reviews.length);
     for (let i = 0; i < reviews.length; i++) {
       let scores = reviews[i].scores[0];
-      // console.log(scores);
 
       helperScore += +scores.cleanliness;
       helperScore += +scores.communication;
@@ -45,6 +44,7 @@ class Score extends React.Component {
     return (finalScore / reviews.length);
   }
 
+  //Get # of total reviews
   totalReviews(value) {
     if (value.length === 0) {
       return 0;
@@ -59,7 +59,5 @@ class Score extends React.Component {
     </div>)
   }
 }
-
-<img src={star} alt='Star' />
 
 export default Score;
