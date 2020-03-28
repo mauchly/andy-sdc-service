@@ -43,8 +43,8 @@ class Ratings extends React.Component {
 
   }
 
+  //Calculate positoning for individual number ratings
   border(value, attr) {
-    console.log(((+this.attrScore(value, attr) * 20).toFixed(0) + '%').toString())
     return {
       'borderBottom': 'solid',
       'borderBottomWidth': '50%',
@@ -57,16 +57,15 @@ class Ratings extends React.Component {
     }
   }
 
+  //Get score for single attribute
   attrScore(value, attr) {
     if (value.length === 0) {
       return 0;
     }
     let helperScore = 0;
     let reviews = value[0].reviews;
-    // console.log('value of reviews', reviews.length);
     for (let i = 0; i < reviews.length; i++) {
       let scores = reviews[i].scores[0];
-      // console.log(scores);
       helperScore += +scores[attr];
     }
     return (helperScore / reviews.length);
