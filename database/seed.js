@@ -8,6 +8,7 @@ let randYear = () => {
   return years[rand];
 }
 
+//Random rating number generator
 let floatNum = () => {
   let rand1 = Math.floor(Math.random() * Math.floor(5));
   let rand2 = Math.floor(Math.random() * Math.floor(9));

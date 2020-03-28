@@ -19,12 +19,20 @@ let borderStyle = {
 }
 
 let numStyle = {
-  'position': 'relative',
-  'left': '100px',
+  'position': 'absolute',
+  'left': '90%',
   'display': 'inLine',
   'fontSize': '12px',
-  'padding': '10px'
+  'padding': '5px'
 }
+
+let leftNumStyle = {
+  'position': 'absolute',
+  'left': '45%',
+  'display': 'inLine',
+  'fontSize': '12px',
+  'padding': '5px'
+};
 
 let breakStyle = {
   'padding': '7px'
@@ -35,6 +43,7 @@ class Ratings extends React.Component {
     super(props)
 
   }
+
 
   render() {
     return (<div style={divStyle}>
