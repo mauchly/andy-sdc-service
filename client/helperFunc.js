@@ -6,10 +6,8 @@ const score = (value) => {
   let finalScore = 0;
   let helperScore = 0;
   let reviews = value[0].reviews;
-  // console.log('value of reviews', JSON.stringify(value));
   for (let i = 0; i < reviews.length; i++) {
     let scores = reviews[i].scores[0];
-    // console.log(scores);
 
     helperScore += +scores.cleanliness;
     helperScore += +scores.communication;
@@ -35,7 +33,6 @@ const totalReviews = (value) => {
 //ratings.jsx
 
 const border = (value, attr) => {
-  console.log(((+attrScore(value, attr) * 20).toFixed(0) + '%').toString())
   return {
     'borderBottom': 'solid',
     'borderBottomWidth': '50%',
@@ -54,10 +51,8 @@ const attrScore = (value, attr) => {
   }
   let helperScore = 0;
   let reviews = value[0].reviews;
-  // console.log('value of reviews', reviews.length);
   for (let i = 0; i < reviews.length; i++) {
     let scores = reviews[i].scores[0];
-    // console.log(scores);
     helperScore += +scores[attr];
   }
   return (helperScore / reviews.length);

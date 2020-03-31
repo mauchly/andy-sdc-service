@@ -4,6 +4,16 @@ import $ from 'jquery';
 import Score from './components/score.jsx';
 import Ratings from './components/ratings.jsx';
 import Reviews from './components/reviews.jsx';
+import pic1 from '!file-loader!../../AfterReviewsHardcodePhoto1.png';
+import pic2 from '!file-loader!../../AfterReviewsHardcodePhoto2.png';
+import pic3 from '!file-loader!../../AfterReviewsHardcodePhoto3.png';
+
+const imgStyle = {
+  'width': '100%',
+  'height': '100%',
+  'position': 'relative',
+  'right': '200px'
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -45,6 +55,9 @@ render() {
     <Ratings reviews={this.state.reviews} />
     <br></br>
     <Reviews reviews={this.state.reviews} />
+    <img src={pic1} style={imgStyle} alt='Hardcode1' />
+    <img src={pic2} style={imgStyle} alt='Hardcode2' />
+    <img src={pic3} style={imgStyle} alt='Hardcode3' />
   </div>)
 }
 }

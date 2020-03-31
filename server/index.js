@@ -7,6 +7,10 @@ let app = express();
 app.use(express.static('public'));
 app.use(express.text());
 app.use(express.urlencoded());
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 //For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
 app.get('/averageScore:id', (req, res) => {
