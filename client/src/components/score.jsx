@@ -1,5 +1,5 @@
 import React from 'react';
-import star from '!file-loader!../../../airbnb_star.png';
+import star from '!file-loader!../../../img/airbnb_star.png';
 import { score, totalReviews } from '../../helperFunc.js';
 
 let divStyle = {
