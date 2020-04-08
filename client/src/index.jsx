@@ -4,15 +4,15 @@ import $ from 'jquery';
 import Score from './components/score.jsx';
 import Ratings from './components/ratings.jsx';
 import Reviews from './components/reviews.jsx';
-import pic1 from '!file-loader!../../img/AfterReviewsHardcodePhoto1.png';
-import pic2 from '!file-loader!../../img/AfterReviewsHardcodePhoto2.png';
-import pic3 from '!file-loader!../../img/AfterReviewsHardcodePhoto3.png';
+// import pic1 from '!file-loader!../../img/AfterReviewsHardcodePhoto1.png';
+// import pic2 from '!file-loader!../../img/AfterReviewsHardcodePhoto2.png';
+// import pic3 from '!file-loader!../../img/AfterReviewsHardcodePhoto3.png';
 
 const imgStyle = {
-  'width': '100%',
-  'height': '100%',
+  'width': '80%',
+  'height': '80%',
   'position': 'relative',
-  'right': '200px'
+  'right': '125px'
 }
 
 class App extends React.Component {
@@ -35,7 +35,7 @@ class App extends React.Component {
     }
     $.ajax({
       type: 'GET',
-      url: "http://127.0.0.1:3004/listing",
+      url: "http://localhost:3004/listing",
       data: {data: listingId},
       dataType: 'text',
       success: (results) => {
@@ -55,9 +55,9 @@ render() {
     <Ratings reviews={this.state.reviews} />
     <br></br>
     <Reviews reviews={this.state.reviews} />
-    <img src={pic1} style={imgStyle} alt='Hardcode1' />
-    <img src={pic2} style={imgStyle} alt='Hardcode2' />
-    <img src={pic3} style={imgStyle} alt='Hardcode3' />
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto2.png' style={imgStyle} alt='Hardcode2' id='Hardcode2' />
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto1.png' style={imgStyle} alt='Hardcode1' id='Hardcode1'/>
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto3.png' style={imgStyle} alt='Hardcode3' id='Hardcode3'/>
   </div>)
 }
 }

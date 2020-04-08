@@ -1,5 +1,5 @@
 import React from 'react';
-import star from '!file-loader!../../../img/airbnb_star.png';
+// import star from '!file-loader!../../../img/airbnb_star.png';
 import { score, totalReviews } from '../../helperFunc.js';
 
 let divStyle = {
@@ -23,7 +23,7 @@ class Score extends React.Component {
 
   render() {
     return (<div style={divStyle}>
-      <img src={star} alt='Star' style={imgStyle} /> {(score(this.props.reviews)).toFixed(2)}    ({totalReviews(this.props.reviews)} reviews)
+      <img src='https://fec-photos.s3-us-west-1.amazonaws.com/otherPics/airbnb_star.png' alt='Star' style={imgStyle} /> {(score(this.props.reviews)).toFixed(2)}    ({totalReviews(this.props.reviews)} reviews)
     </div>)
   }
 }
