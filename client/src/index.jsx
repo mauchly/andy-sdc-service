@@ -55,9 +55,9 @@ render() {
     <Ratings reviews={this.state.reviews} />
     <br></br>
     <Reviews reviews={this.state.reviews} />
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto2.png' style={imgStyle} alt='Hardcode2' />
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto1.png' style={imgStyle} alt='Hardcode1' />
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto3.png' style={imgStyle} alt='Hardcode3' />
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto2.png' style={imgStyle} alt='Hardcode2' id='Hardcode2' />
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto1.png' style={imgStyle} alt='Hardcode1' id='Hardcode1'/>
+    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto3.png' style={imgStyle} alt='Hardcode3' id='Hardcode3'/>
   </div>)
 }
 }
