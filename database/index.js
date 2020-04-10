@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://ec2-18-144-172-224.us-west-1.compute.amazonaws.com/abreviews'); //127.0.0.1:27017
+mongoose.connect('mongodb://localhost/abreviews'); //127.0.0.1:27017
 
 //check for DB connection...can be removed once DB is validated
 var db = mongoose.connection;
