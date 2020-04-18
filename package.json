@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "express-static-gzip": "^2.0.6",
     "faker": "^4.1.0",
     "minimist": "^1.2.5",
     "mongo-seeding": "^3.4.0",
@@ -33,6 +34,7 @@
     "babel-loader": "^8.0.6",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "brotli-webpack-plugin": "^1.1.0",
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor",
     "file-loader": "^6.0.0",
     "image-webpack-loader": "^6.0.0",
