@@ -35,7 +35,7 @@ class App extends React.Component {
     }
     $.ajax({
       type: 'GET',
-      url: "http://ec2-18-144-172-224.us-west-1.compute.amazonaws.com:3004/listing",
+      url: "http://ec2-13-57-252-100.us-west-1.compute.amazonaws.com:3004/listing",
       data: {data: listingId},
       dataType: 'text',
       success: (results) => {
