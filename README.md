@@ -21,16 +21,23 @@
 
 ## Usage
 
+####npm install
+  - Install dependencies in a local node_modules directory
+
 ####npm run seed
+  - Seed the MongoDB with Faker data
 
 ####npm run react-dev
+  - Builds out app in production mode, will make new bundle.js on each iteration
 
 ####npm run server-dev
+  - Runs development server in nodemon to see changes made
 
 ####npm run test
+  - Runs Jest tests
 
 ####npm run build
-
+  - Gives a production build of bundle.js, also will output a Brotli compressed bersion of file.
 
 ## Tech
 
