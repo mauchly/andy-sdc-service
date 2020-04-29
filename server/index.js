@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { Reviews } = require('../database/index');
-var expressStaticGzip = require("express-static-gzip");
+var expressStaticGzip = require("express-static-gzip")
 
 let app = express();
 
