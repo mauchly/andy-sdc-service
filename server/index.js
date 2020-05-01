@@ -1,26 +1,27 @@
 const express = require('express');
 const path = require('path');
-const { Reviews } = require('../database/index');
-var expressStaticGzip = require("express-static-gzip")
+const Reviews = require('../database/index');
+var expressStaticGzip = require('express-static-gzip');
 
 let app = express();
 
 // app.use(express.static('public'));
 app.use(express.text());
 app.use(express.urlencoded());
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
-app.use('/', expressStaticGzip(path.join(__dirname + '/../public'), {
-  enableBrotli: true
-}));
+app.use(
+  '/',
+  expressStaticGzip(path.join(__dirname + '/../public'), { enableBrotli: true })
+);
 
 //For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
 app.get('/averageScore:id', (req, res) => {
   let listId = req.params.id;
-  Reviews.find({id: listId}, (err, result) => {
+  Reviews.find({ id: listId }, (err, result) => {
     if (err) {
       console.log('error in averageScore', err);
       res.sendStatus(404);
@@ -42,13 +43,17 @@ app.get('/averageScore:id', (req, res) => {
         helperScore += +scores.location;
         helperScore += +scores.value;
 
-        finalScore += (helperScore / 6);
+        finalScore += helperScore / 6;
         helperScore = 0;
       }
-      res.end(`${(finalScore / reviews.length).toFixed(2).toString()}, (${reviewNumber} reviews)`);
+      res.end(
+        `${(finalScore / reviews.length)
+          .toFixed(2)
+          .toString()}, (${reviewNumber} reviews)`
+      );
     }
-  })
-})
+  });
+});
 
 //Get listing by either id or name
 app.get('/listing', (req, res) => {
@@ -59,24 +64,25 @@ app.get('/listing', (req, res) => {
 
   //if text of listing...
   if (!result) {
-    Reviews.find({name: listId}, (err, result) => {
+    Reviews.find({ name: listId }, (err, result) => {
       if (err) {
         console.log('error in Reviews.find', err);
         res.sendStatus(404);
       } else {
+        console.log(result, 'line 69');
         res.send(result);
       }
-    })
+    });
     //else if id of listing...
   } else {
-    Reviews.find({id: listId}, (err, result) => {
+    Reviews.find({ id: listId }, (err, result) => {
       if (err) {
         console.log('error in Reviews.find', err);
         res.sendStatus(404);
       } else {
         res.send(result);
       }
-    })
+    });
   }
 });
 

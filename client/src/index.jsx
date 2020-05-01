@@ -9,11 +9,11 @@ import Reviews from './components/reviews.jsx';
 // import pic3 from '!file-loader!../../img/AfterReviewsHardcodePhoto3.png';
 
 const imgStyle = {
-  'width': '80%',
-  'height': '80%',
-  'position': 'relative',
-  'right': '125px'
-}
+  width: '80%',
+  height: '80%',
+  position: 'relative',
+  right: '125px',
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -21,7 +21,7 @@ class App extends React.Component {
     this.state = {
       reviews: [],
       dataLoaded: false,
-    }
+    };
   }
 
   //get URL, split, pass data to get listing information and pass to state as reviews.
@@ -35,33 +35,50 @@ class App extends React.Component {
     }
     $.ajax({
       type: 'GET',
-      url: "http://ec2-13-57-252-100.us-west-1.compute.amazonaws.com:3004/listing",
-      data: {data: listingId},
+      url: 'http://localhost:3004/listing',
+      data: { data: listingId },
       dataType: 'text',
       success: (results) => {
         let state = JSON.parse(results);
-        this.setState(() => ({reviews: state}));
+        this.setState(() => ({ reviews: state }));
       },
       error: () => {
         console.log('error in onload API call');
-      }
+      },
     });
   }
 
-render() {
-  return (<div>
-    <div id='reviewSection'>
-    <Score reviews={this.state.reviews} />
-    <br></br>
-    <Ratings reviews={this.state.reviews} />
-    <br></br>
-    <Reviews reviews={this.state.reviews} />
-    </div>
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto2.png' style={imgStyle} alt='Hardcode2' id='Hardcode2' />
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto1.png' style={imgStyle} alt='Hardcode1' id='Hardcode1'/>
-    <img src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto3.png' style={imgStyle} alt='Hardcode3' id='Hardcode3'/>
-  </div>)
-}
+  render() {
+    return (
+      <div>
+        <div id='reviewSection'>
+          <Score reviews={this.state.reviews} />
+          <br></br>
+          <Ratings reviews={this.state.reviews} />
+          <br></br>
+          <Reviews reviews={this.state.reviews} />
+        </div>
+        <img
+          src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto2.png'
+          style={imgStyle}
+          alt='Hardcode2'
+          id='Hardcode2'
+        />
+        <img
+          src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto1.png'
+          style={imgStyle}
+          alt='Hardcode1'
+          id='Hardcode1'
+        />
+        <img
+          src='https://fec-photos-3004.s3-us-west-1.amazonaws.com/AfterReviewsHardcodePhoto3.png'
+          style={imgStyle}
+          alt='Hardcode3'
+          id='Hardcode3'
+        />
+      </div>
+    );
+  }
 }
 
 ReactDOM.render(<App />, document.getElementById('reviews'));

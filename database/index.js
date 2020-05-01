@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/abreviews'); //127.0.0.1:27017
+mongoose.connect(
+  'mongodb+srv://root:root@cluster0-3vond.mongodb.net/abreviews',
+  {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }
+); //127.0.0.1:27017
 
 //check for DB connection...can be removed once DB is validated
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log('connection established');
-});
+// var db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error:'));
+// db.once('open', function () {
+//   console.log('connection established');
+// });
 
-let reviewsSchema = mongoose.Schema({
+let reviewsSchema = new mongoose.Schema({
   id: Number,
   name: String,
   reviews: [
@@ -24,13 +30,13 @@ let reviewsSchema = mongoose.Schema({
           checkin: Number,
           accuracy: Number,
           location: Number,
-          value: Number
-        }
-      ]
-    }
+          value: Number,
+        },
+      ],
+    },
   ],
 });
 
-let Reviews = mongoose.model('Reviews', reviewsSchema);
+let Reviews = mongoose.model('reviews', reviewsSchema);
 
-module.exports.Reviews = Reviews;
+module.exports = Reviews;
