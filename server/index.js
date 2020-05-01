@@ -92,19 +92,15 @@ app.get('/listing', (req, res) => {
 //post listing
 app.post('/listing', (req, res) => {
 
-  console.log(req.body, 'line 94');
-
   Reviews.create(req.body, (err, entry) => {
     if (err) {
       console.log(err);
       res.sendStatus(400);
     } else {
-      res.sendStatus(200).send(entry);
-      console.log('SUCCESS!', entry);
+      res.send(entry);
     }
   });
 });
-
 
 //put listing
 

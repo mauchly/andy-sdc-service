@@ -18,8 +18,8 @@ let floatNum = () => {
 };
 
 let sampleData = [];
-let idIndex = 10100;
-let names = ["Online_Bus_Integrated_house_2"];
+let idIndex = 10101;
+let names = ["Online_Bus_Integrated_house_4"];
 let nameIndex = 0;
 
 
@@ -50,9 +50,9 @@ const createEntry = (idIndex, name, numberOfReviews) => {
 };
 
 
-const entry = createEntry(10100, names[0], 14);
+const entry = createEntry(10102, names[0], 14);
 
-console.log(entry[0]);
+console.log(JSON.stringify(entry[0]));
 
 //Clears DB and adds new data to DB
 // Reviews.deleteMany({ id: { $gt: 1 } }, (err) => {
