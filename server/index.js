@@ -7,6 +7,7 @@ let app = express();
 
 // app.use(express.static('public'));
 app.use(express.text());
+app.use(express.json());
 app.use(express.urlencoded());
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -57,7 +58,9 @@ app.get('/averageScore:id', (req, res) => {
 
 //Get listing by either id or name
 app.get('/listing', (req, res) => {
+
   let listId = req.query.data || 10001;
+
   let reg = /\d{5}/;
   //test to see if id num or listing string
   let result = reg.test(listId);
@@ -86,14 +89,39 @@ app.get('/listing', (req, res) => {
   }
 });
 
+//post listing
+app.post('/listing', (req, res) => {
+
+  console.log(req.body, 'line 94');
+
+  Reviews.create(req.body, (err, entry) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      res.sendStatus(200).send(entry);
+      console.log('SUCCESS!', entry);
+    }
+  });
+});
+
+
+//put listing
+
+
+
+//delete listing
+
+
 //Route to get index.html back after updating state
 app.get('/:id', (req, res) => {
-  console.log('send file');
   res.sendFile(path.join(__dirname, '../public', '/index.html'));
 });
 
-app.listen(3004, () => {
-  console.log('Express server for REVIEWS listening on port 3004');
+const port = process.env.PORT || 3004;
+
+app.listen(port, () => {
+  console.log(`Express server for REVIEWS listening on port ${port}`);
 });
 
 module.exports = app;
