@@ -89,7 +89,7 @@ app.get('/listing', (req, res) => {
   }
 });
 
-//post listing
+//Post listing
 app.post('/listing', (req, res) => {
 
   Reviews.create(req.body, (err, entry) => {
@@ -103,7 +103,19 @@ app.post('/listing', (req, res) => {
 });
 
 //put listing
+app.put('/listing/:id', (req, res) => {
+  console.log(req.params.id);
 
+  Reviews.findOneAndUpdate({id: req.params.id}, {name: 'Test name 8'}, (err, entry) => {
+    if (err) {
+      res.send(400);
+      console.log(err);
+    } else {
+      res.send(entry);
+      console.log('Update Success!');
+    }
+  });
+});
 
 
 //delete listing
