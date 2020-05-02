@@ -104,9 +104,8 @@ app.post('/listing', (req, res) => {
 
 //put listing
 app.put('/listing/:id', (req, res) => {
-  console.log(req.params.id);
 
-  Reviews.findOneAndUpdate({id: req.params.id}, {name: 'Test name 8'}, (err, entry) => {
+  Reviews.findOneAndUpdate({id: req.params.id}, req.body, (err, entry) => {
     if (err) {
       res.send(400);
       console.log(err);
@@ -119,7 +118,19 @@ app.put('/listing/:id', (req, res) => {
 
 
 //delete listing
+app.delete('/listing/:id', (req, res) => {
+  console.log(req.params.id);
 
+  Reviews.findOneAndDelete({id: req.params.id}, (err, entry) => {
+    if (err) {
+      res.send(400);
+      console.log(err);
+    } else {
+      res.send(entry);
+      console.log('Delete Success!');
+    }
+  });
+});
 
 //Route to get index.html back after updating state
 app.get('/:id', (req, res) => {
