@@ -4,6 +4,7 @@ import $ from 'jquery';
 import Score from './components/score.jsx';
 import Ratings from './components/ratings.jsx';
 import Reviews from './components/reviews.jsx';
+const port = 5000;
 // import pic1 from '!file-loader!../../img/AfterReviewsHardcodePhoto1.png';
 // import pic2 from '!file-loader!../../img/AfterReviewsHardcodePhoto2.png';
 // import pic3 from '!file-loader!../../img/AfterReviewsHardcodePhoto3.png';
@@ -33,9 +34,10 @@ class App extends React.Component {
     } else {
       listingId = '10001';
     }
+
     $.ajax({
       type: 'GET',
-      url: 'http://localhost:3004/listing',
+      url: `http://localhost:${port}/listing`,
       data: { data: listingId },
       dataType: 'text',
       success: (results) => {
