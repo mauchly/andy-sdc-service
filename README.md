@@ -55,3 +55,9 @@
 - Faker
 - Brotli
 
+## CRUD
+
+Create - http://{HOSTNAME}:{PORT}/listing/
+Read - http://{HOSTNAME}:{PORT}/listing/
+Update - http://{HOSTNAME}:{PORT}/listing/:id
+Delete - http://{HOSTNAME}:{PORT}/listing/:id
