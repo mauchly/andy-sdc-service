@@ -22,6 +22,7 @@ app.use(
 //For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
 app.get('/averageScore:id', (req, res) => {
   let listId = req.params.id;
+
   Reviews.find({ id: listId }, (err, result) => {
     if (err) {
       console.log('error in averageScore', err);
@@ -58,7 +59,6 @@ app.get('/averageScore:id', (req, res) => {
 
 //Get listing by either id or name
 app.get('/listing', (req, res) => {
-
   let listId = req.query.data || 10001;
 
   let reg = /\d{5}/;
@@ -72,7 +72,6 @@ app.get('/listing', (req, res) => {
         console.log('error in Reviews.find', err);
         res.sendStatus(404);
       } else {
-        console.log(result, 'line 69');
         res.send(result);
       }
     });
@@ -91,7 +90,6 @@ app.get('/listing', (req, res) => {
 
 //Post listing
 app.post('/listing', (req, res) => {
-
   Reviews.create(req.body, (err, entry) => {
     if (err) {
       console.log(err);
@@ -104,8 +102,7 @@ app.post('/listing', (req, res) => {
 
 //put listing
 app.put('/listing/:id', (req, res) => {
-
-  Reviews.findOneAndUpdate({id: req.params.id}, req.body, (err, entry) => {
+  Reviews.findOneAndUpdate({ id: req.params.id }, req.body, (err, entry) => {
     if (err) {
       res.send(400);
       console.log(err);
@@ -116,12 +113,11 @@ app.put('/listing/:id', (req, res) => {
   });
 });
 
-
 //delete listing
 app.delete('/listing/:id', (req, res) => {
   console.log(req.params.id);
 
-  Reviews.findOneAndDelete({id: req.params.id}, (err, entry) => {
+  Reviews.findOneAndDelete({ id: req.params.id }, (err, entry) => {
     if (err) {
       res.send(400);
       console.log(err);
