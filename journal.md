@@ -48,4 +48,13 @@ _Decided to just use Postgres and skip Sequelize for now. Adding too much comple
 
 - Created connection in database/index.js file
 - Created schemas for listing and reviews tables at database/addTables.js
-- **Need to refactor seed script**
+
+> Create Schemas
+
+- Created schemas and added them to 'addTables.js' file.
+
+> Seed Data to Postgres
+
+- Refactored helper funcs and created seed scripts
+- Data can be successfully seed at 10k - 100k entries
+- **Researching use of promises to seed data 10k at a time to reach 10M**
