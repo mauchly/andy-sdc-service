@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
-const Reviews = require('../database/index');
+// const Reviews = require('../database/mongo');
+const client = require('../database/postgres/index');
 var expressStaticGzip = require('express-static-gzip');
 
 let app = express();
@@ -64,6 +65,22 @@ app.get('/listing', (req, res) => {
   let reg = /\d{5}/;
   //test to see if id num or listing string
   let result = reg.test(listId);
+
+  //=======================================
+  // POSTGRES QUERY
+  //=======================================
+
+  // client
+  //   .query(
+  //     `SELECT listings.id, reviews.* FROM listings, reviews where listings.id = ${listId} and listings.id = reviews.listing_id;`
+  //   )
+  //   .then((res) => {
+  //     console.log(res.rows);
+  //   });
+
+  //=======================================
+  // MONGO QUERY
+  //=======================================
 
   //if text of listing...
   if (!result) {
