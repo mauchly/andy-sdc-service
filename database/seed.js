@@ -23,13 +23,11 @@ const floatNum = () => {
 //==================================
 // Create Listings Query String func
 //==================================
-
 const listingQueryStr = (numOfListings) => {
   let listingStr = '';
 
   for (let i = 0; i < numOfListings; i++) {
-    listingStr += `('${faker.random.word()}',
-                     ${floatNum()},
+    listingStr += `(${floatNum()},
                      ${floatNum()},
                      ${floatNum()},
                      ${floatNum()},
@@ -40,14 +38,13 @@ const listingQueryStr = (numOfListings) => {
 
   listingStr = listingStr.slice(0, -1);
 
-  return `INSERT INTO listings (name, communication, checkin, value, accuracy, location, cleaniness)
+  return `INSERT INTO listings (communication, checkin, value, accuracy, location, cleanliness)
   VALUES ${listingStr};`;
 };
 
 //==================================
 // Create Reviews Query Strign func
 //==================================
-
 const createReviewQueryStr = (id, num) => {
   let reviewStr = '';
 
@@ -62,12 +59,12 @@ const createReviewQueryStr = (id, num) => {
   return reviewStr;
 };
 
-const totalReviewsQueryString = (numOfReviews) => {
+const totalReviewsQueryString = (startId, endId) => {
   const random = () => Math.floor(Math.random() * (20 - 1 + 1) + 1);
 
   let reviewStrTotal = '';
 
-  for (let i = 1; i <= numOfReviews; i++) {
+  for (let i = startId; i <= endId; i++) {
     reviewStrTotal += createReviewQueryStr(i, random());
   }
 
