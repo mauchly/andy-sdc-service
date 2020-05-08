@@ -23,11 +23,12 @@ const floatNum = () => {
 //==================================
 // Create Listings Query String func
 //==================================
-const listingQueryStr = (numOfListings) => {
+const listingQueryStr = (startIdx, endIdx) => {
   let listingStr = '';
 
-  for (let i = 0; i < numOfListings; i++) {
-    listingStr += `(${floatNum()},
+  for (let i = startIdx; i <= endIdx; i++) {
+    listingStr += `( ${i},
+                     ${floatNum()},
                      ${floatNum()},
                      ${floatNum()},
                      ${floatNum()},
@@ -38,7 +39,7 @@ const listingQueryStr = (numOfListings) => {
 
   listingStr = listingStr.slice(0, -1);
 
-  return `INSERT INTO listings (communication, checkin, value, accuracy, location, cleanliness)
+  return `INSERT INTO listings (id, communication, checkin, value, accuracy, location, cleanliness)
   VALUES ${listingStr};`;
 };
 
@@ -77,18 +78,66 @@ const totalReviewsQueryString = (startId, endId) => {
 // Add query strigns to Database
 //==================================
 
-let listingInputStr = listingQueryString(10);
-let reviewsQueryString = totalReviewsQueryString(10);
+// let listingInputStr = listingQueryStr(10);
+// let reviewsQueryString = totalReviewsQueryString(1, 20);
 
-client
-  .query(reviewsQueryString)
-  .then(() => {
-    console.log('Reviews added to DB');
-    client.end();
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// const dataEntryThread = async (count) => {
+//   let listingStr1 = listingQueryStr(count, count + 9999);
+//   let reviewsStr1 = totalReviewsQueryString(count, count + 9999);
+
+//   console.log(count, 'idx start');
+//   console.log(count + 9999, 'idx end');
+
+//   try {
+//     let listingResponse = await client.query(listingStr1);
+//   } catch (err) {
+//     throw err;
+//   }
+
+//   if (listingResponse) {
+//     try {
+//       let queryResponse = await client.query(reviewsStr1);
+//     } catch (err) {
+//       throw err;
+//     }
+//   }
+// };
+
+//==================================
+// Seed database with 100K listings and ~1M reviews
+//==================================
+const seedData = async () => {
+  let count = 1;
+
+  while (count <= 100000) {
+    let listingStr1 = listingQueryStr(count, count + 9999);
+    let reviewsStr1 = totalReviewsQueryString(count, count + 9999);
+
+    console.log(count);
+
+    let listingResponse = await client.query(listingStr1);
+    if (listingResponse) {
+      let queryResponse = await client.query(reviewsStr1);
+    }
+
+    count += 10000;
+  }
+
+  client.end();
+  console.log('data seeded!');
+};
+
+seedData();
+
+// client
+//   .query(reviewsQueryString)
+//   .then((res) => {
+//     console.log('Reviews added to DB');
+//     client.end();
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 //==================================
 // MONGODB
