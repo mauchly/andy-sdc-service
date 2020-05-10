@@ -1,5 +1,5 @@
 //==================================
-// POSTGRES DB
+// POSTGRES DB SEED WITH SQL QUERY
 //==================================
 const client = require('./index');
 const faker = require('faker');
@@ -125,5 +125,3 @@ const seedData = async () => {
   client.end();
   console.log('data seeded!');
 };
-
-seedData();

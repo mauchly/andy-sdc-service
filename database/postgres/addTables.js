@@ -14,12 +14,12 @@ CREATE TABLE IF NOT EXISTS reviews (
     avatar TEXT,
     text TEXT,
     listing_id INT,
-    communication NUMERIC (2, 1),
-    checkin NUMERIC (2, 1),
-    value NUMERIC (2, 1),
-    accuracy NUMERIC (2, 1),
-    location NUMERIC (2, 1),
-    cleanliness NUMERIC (2, 1),
+    communication DECIMAL (2, 1),
+    checkin DECIMAL (2, 1),
+    value DECIMAL (2, 1),
+    accuracy DECIMAL (2, 1),
+    location DECIMAL (2, 1),
+    cleanliness DECIMAL (2, 1),
     FOREIGN KEY(listing_id) REFERENCES listings(id)
 );
 `;
