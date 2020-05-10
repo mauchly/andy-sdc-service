@@ -71,30 +71,29 @@ const totalReviewsQueryString = (id) => {
 // Record Generator for CSV file
 //==================================
 
-const recordGenerator = (dataFunc, stream) => {
-  let listingId = 1;
-  for (let i = 0; i < 1000; i++) {
-    if (i === 0) {
-      let result = dataFunc(listingId);
-      let write = stream.write(result);
-      if (!write) {
-        stream.once('drain', dataFunc);
-      }
-    } else {
-      listingId += 10000;
-      let data = dataFunc(listingId);
-      let write = stream.write(data);
-      if (!write) {
-        stream.once('drain', dataFunc);
-      }
+const createCSV = (entries, stream) => {
+  let listId = 1;
+
+  // First 10K entries
+  let entryStr = entries(listId);
+  let ok = stream.write(entryStr);
+
+  for (let i = 1; i < 1000; i++) {
+    listId += 10000;
+    let entryStr = entries(listId);
+    let ok = stream.write(entryStr);
+    if (!ok) {
+      stream.once('drain', dataFunc);
     }
-    console.log('listingId', listingId);
+
+    console.log('Current iteration: ', listingId);
   }
+
   stream.end();
 };
 
-// recordGenerator(totalReviewsQueryString, reviewsStream);
-// recordGenerator(listingQueryStr, listingsStream);
+// createCSV(totalReviewsQueryString, reviewsStream);
+// createCSV(listingQueryStr, listingsStream);
 
 //==================================
 // PSQL Command
