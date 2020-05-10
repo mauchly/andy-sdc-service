@@ -68,7 +68,7 @@ const totalReviewsQueryString = (id) => {
 };
 
 //==================================
-// Record Generator for CSV file
+// CSV Generator for CSV file
 //==================================
 
 const createCSV = (entries, stream) => {
