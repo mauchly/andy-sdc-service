@@ -33,3 +33,6 @@ public/d952f3584101a206dc267a0f3ef61c24.png
 # Config
 database/database.config.js
 
+# Data
+data/
+
