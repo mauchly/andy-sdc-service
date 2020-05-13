@@ -116,6 +116,7 @@ Relevant Docs
 
 Relevant docs
 <https://www.npmjs.com/package/couchimport>
+
 <https://medium.com/codait/simple-csv-import-for-couchdb-71616200b095>
 
 #### Seed small Data set
@@ -124,10 +125,10 @@ Relevant docs
 - **Added header to CSV** current script does not generate header
 - downloaded NPM package `couchimport`
 - used script
-  - `curl -X PUT http://{username:password}localhost:5984/{documentName}`
+  - `curl -X PUT http://{username:password}@localhost:5984/{documentName}`
   - to create document abreviews
 - used script
-  - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’`
+  - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’ CSV HEADER`
   - to seed small data set.
 
 - Data small data set successfully Seeded!
@@ -138,35 +139,69 @@ Relevant docs
 
 ### DBMS Benchmarking PostgreSQL
 
-#### GET REQUESTS
+#### Initial query speeds
 
-- **URL:** '/listing?data={listId}
-- **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
-- **Data:** 'res.rows' object.
-- **Format:**
+Query:
 
-```javascript
-[
-  {
-    id: 110417,
-    username: 'Jolie.Cronin',
-    date: 'April 2020',
-    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/m4rio/128.jpg',
-    text:
-      'Mollitia aperiam distinctio ducimus. Illo vel aliquam at ut dicta ut corrupti distinctio. Cupiditate minus est qui id sunt cum reiciendis praesentium. Numquam libero repellat corrupti.',
-    listing_id: 10456,
-    communication: '3.3',
-    checkin: '1.6',
-    value: '4.6',
-    accuracy: '1.8',
-    location: '2.2',
-    cleanliness: '2.8',
-  },
-];
+``` SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE id = 24000000;
 ```
 
-#### POST REQUESTS
+- `Planning Time: 0.694 ms`
+- `Execution Time: 25.541 ms`
 
-#### PUT REQUESTS
+Ran same query again and speeds were significantly faster.
 
-#### DELETE REQUESTS
+- `Planning Time: 0.079 ms`
+- `Execution Time: 0.038 ms`
+
+**Issue: when querying reviews based on foreign key `listing_id` performnce is significantly slower**
+
+```SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
+```
+
+- `Planning Time: 0.089 ms`
+- `Execution Time: 84658.076 ms`
+
+Made no difference if I ran it again still querying very slow.
+
+**Research**
+Looked into posgres VACUUM
+
+Ran query:
+
+```SQL
+VACUUM(FULL, ANALYZE, VERBOSE) reviews;
+```
+
+- still slow, no effect on query speed.
+- doc ref: <https://confluence.atlassian.com/kb/optimize-and-improve-postgresql-performance-with-vacuum-analyze-and-reindex-885239781.html>
+
+Looked into creating an index on my foreign key
+
+- doc ref:
+  - <https://www.postgresql.org/docs/9.1/sql-createindex.html>
+  - <https://www.youtube.com/watch?v=19eLh1ZdoLY>
+
+Ran query:
+
+```SQL
+CREATE INDEX idx_listing_id ON reviews(listing_id);
+```
+
+```SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
+```
+
+- `Planning Time: 0.092 ms`
+- `Execution Time: 26.683 ms`
+
+Ran SELECT query again and got:
+
+- `Planning Time: 0.087 ms`
+- `Execution Time: 0.042 ms`
+
+SUCCESS!!
+
+### DBMS Benchmarking CouchDB
