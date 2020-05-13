@@ -1,8 +1,8 @@
 # Engineering Journal SDC Reviews Service
 
-# Phase 1 Scale the DB
+## Phase 1 Scale the DB
 
-## Support CRUD with MONGO DB
+### Support CRUD with MONGO DB
 
 Refactored database files and Models to use Mongodb atlas
 Set up POST PUT DELETE. GET was already set up from initial code
@@ -10,11 +10,11 @@ Set up POST PUT DELETE. GET was already set up from initial code
 **Observations/Next steps**
 Need to completely refactor to connect to Postgres
 
-## DBMS Selection and Data Generation
+### DBMS Selection and Data Generation
 
 - Postgres and CouchDB
 
-### Implementing Postgres
+#### Implementing Postgres
 
 Set up postgres on local machine.
 Decided to use terminal instead of GUI to manage DB
@@ -23,7 +23,7 @@ _Still unsure if I want to implement Sequelize as will make DB more fluid if nee
 
 _Thinking I should just use Sequelize as it will abstract out schema design and querying using SQL. This may save more time?_
 
-### Setting up Sequelize
+#### Setting up Sequelize
 
 - npm install sequelize pg --save
 
@@ -55,19 +55,17 @@ _Decided to just use Postgres and skip Sequelize for now. Adding too much comple
 - Created connection in database/index.js file
 - Created schemas for listing and reviews tables at database/addTables.js
 
-#### Create Schemas
+##### Create Schemas
 
 - Created schemas and added them to 'addTables.js' file.
 
-#### Data generation and seeding to Postgres
+##### Data generation and seeding to Postgres
 
 Relevant Docs
 
-> https://www.postgresql.org/docs/current/populate.html
-
-> https://nodejs.org/api/stream.html#stream_event_drain
-
-> https://thoughtbot.com/blog/reading-an-explain-analyze-query-plan
+<https://www.postgresql.org/docs/current/populate.html>
+<https://nodejs.org/api/stream.html#stream_event_drain>
+<https://thoughtbot.com/blog/reading-an-explain-analyze-query-plan>
 
 - Refactored helper funcs and created seed scripts
 - Data can be successfully seed at 10k - 100k entries
@@ -90,9 +88,9 @@ Listings Query
 COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ```
 
-## DBMS Benchmarking
+#### DBMS Benchmarking
 
-### GET REQUESTS
+##### GET REQUESTS
 
 - **URL:** '/listing?data={listId}
 - **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
@@ -119,8 +117,54 @@ COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ];
 ```
 
-### POST REQUESTS
+##### POST REQUESTS
 
-### PUT REQUESTS
+##### PUT REQUESTS
 
-### DELETE REQUESTS
+##### DELETE REQUESTS
+
+#### Implementing CouchDB
+
+Relevant Docs
+
+<https://docs.couchdb.org/en/stable/index.html>
+<https://www.youtube.com/watch?v=nlqv9Np3iAU>
+
+##### Hello DB
+
+- Downloaded and installed couch db
+- Used GUI Fixation to interact with DB
+- Set up testdb as cluster as this will help with faster querying for large data sets.
+- Set up partition key with creating test documents. Set key as id.
+
+``` javascript
+{
+  "_id": "{PARTITION KEY}:72e8bdde44adc8fc4a1b3fedba0086c5",
+  "id": 1,
+  "name": "testName1",
+  "text": "alskdfaslkjdfalskdjfalksdjfaskdfja",
+  "listing_id": 8
+}
+```
+
+##### Migrate CSV to Couch DB
+
+Relevant docs
+<https://www.npmjs.com/package/couchimport>
+<https://medium.com/codait/simple-csv-import-for-couchdb-71616200b095>
+
+##### Seed small Data set
+
+- Created small data set `myOutputReviewsSmall.csv` with 1000 entries to test migration.
+- **Added header to CSV** current script does not generate header
+- downloaded NPM package `couchimport`
+- used script
+  - `curl -X PUT http://localhost:5984/{documentName}`
+  - to create document abreviews
+- used script
+  - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’`
+  - to seed small data set.
+
+- Data small data set successfully Seeded!
+
+##### Seed Large data set
