@@ -69,40 +69,39 @@ app.get('/listing', (req, res) => {
   //=======================================
   // POSTGRES QUERY
   //=======================================
-
-  // client
-  //   .query(
-  //     `SELECT listings.id, reviews.* FROM listings, reviews where listings.id = ${listId} and listings.id = reviews.listing_id;`
-  //   )
-  //   .then((res) => {
-  //     console.log(res.rows);
-  //   });
+  console.log(listId);
+  client
+    .query(`SELECT * FROM reviews where listing_id = ${listId};`)
+    .then((res) => {
+      console.log(res.rows);
+      res.send(res.rows);
+    });
 
   //=======================================
   // MONGO QUERY
   //=======================================
 
   //if text of listing...
-  if (!result) {
-    Reviews.find({ name: listId }, (err, result) => {
-      if (err) {
-        console.log('error in Reviews.find', err);
-        res.sendStatus(404);
-      } else {
-        res.send(result);
-      }
-    });
-    //else if id of listing...
-  } else {
-    Reviews.find({ id: listId }, (err, result) => {
-      if (err) {
-        console.log('error in Reviews.find', err);
-        res.sendStatus(404);
-      } else {
-        res.send(result);
-      }
-    });
-  }
+  // if (!result) {
+  //   Reviews.find({ name: listId }, (err, result) => {
+  //     if (err) {
+  //       console.log('error in Reviews.find', err);
+  //       res.sendStatus(404);
+  //     } else {
+  //       res.send(result);
+  //     }
+  //   });
+  //   //else if id of listing...
+  // } else {
+  //   Reviews.find({ id: listId }, (err, result) => {
+  //     if (err) {
+  //       console.log('error in Reviews.find', err);
+  //       res.sendStatus(404);
+  //     } else {
+  //       res.send(result);
+  //     }
+  //   });
+  // }
 });
 
 //Post listing
