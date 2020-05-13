@@ -14,7 +14,7 @@ Need to completely refactor to connect to Postgres
 
 - Postgres and CouchDB
 
-#### Implementing Postgres
+### Implementing Postgres
 
 Set up postgres on local machine.
 Decided to use terminal instead of GUI to manage DB
@@ -55,11 +55,11 @@ _Decided to just use Postgres and skip Sequelize for now. Adding too much comple
 - Created connection in database/index.js file
 - Created schemas for listing and reviews tables at database/addTables.js
 
-##### Create Schemas
+#### Create Schemas
 
 - Created schemas and added them to 'addTables.js' file.
 
-##### Data generation and seeding to Postgres
+#### Data generation and seeding to Postgres
 
 Relevant Docs
 
@@ -88,14 +88,14 @@ Listings Query
 COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ```
 
-#### Implementing CouchDB
+### Implementing CouchDB
 
 Relevant Docs
 
 <https://docs.couchdb.org/en/stable/index.html>
 <https://www.youtube.com/watch?v=nlqv9Np3iAU>
 
-##### Hello DB
+#### Hello DB
 
 - Downloaded and installed couch db
 - Used GUI Fixation to interact with DB
@@ -112,13 +112,13 @@ Relevant Docs
 }
 ```
 
-##### Migrate CSV to Couch DB
+#### Migrate CSV to Couch DB
 
 Relevant docs
 <https://www.npmjs.com/package/couchimport>
 <https://medium.com/codait/simple-csv-import-for-couchdb-71616200b095>
 
-##### Seed small Data set
+#### Seed small Data set
 
 - Created small data set `myOutputReviewsSmall.csv` with 1000 entries to test migration.
 - **Added header to CSV** current script does not generate header
@@ -132,13 +132,13 @@ Relevant docs
 
 - Data small data set successfully Seeded!
 
-##### Seed Large data set
+#### Seed Large data set
 
 - Used same script for Large data set and was seeded successfully!
 
-#### DBMS Benchmarking PostgreSQL
+### DBMS Benchmarking PostgreSQL
 
-##### GET REQUESTS
+#### GET REQUESTS
 
 - **URL:** '/listing?data={listId}
 - **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
@@ -165,8 +165,8 @@ Relevant docs
 ];
 ```
 
-##### POST REQUESTS
+#### POST REQUESTS
 
-##### PUT REQUESTS
+#### PUT REQUESTS
 
-##### DELETE REQUESTS
+#### DELETE REQUESTS
