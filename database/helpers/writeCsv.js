@@ -71,28 +71,31 @@ const totalReviewsQueryString = (id) => {
 // CSV Generator for CSV file
 //==================================
 
-const createCSV = (entries, stream) => {
+const createCSV = (dataGenFunc, stream) => {
   let listId = 1;
 
   // First 10K entries
-  let entryStr = entries(listId);
+  let entryStr = dataGenFunc(listId);
   let ok = stream.write(entryStr);
+  if (!ok) {
+    stream.once('drain', dataGenFunc);
+  }
 
   for (let i = 1; i < 1000; i++) {
     listId += 10000;
-    let entryStr = entries(listId);
+    let entryStr = dataGenFunc(listId);
     let ok = stream.write(entryStr);
     if (!ok) {
-      stream.once('drain', dataFunc);
+      stream.once('drain', dataGenFunc);
     }
 
-    console.log('Current iteration: ', listingId);
+    console.log('Current iteration: ', listId);
   }
 
   stream.end();
 };
 
-// createCSV(totalReviewsQueryString, reviewsStream);
+createCSV(totalReviewsQueryString, reviewsStream);
 // createCSV(listingQueryStr, listingsStream);
 
 //==================================
