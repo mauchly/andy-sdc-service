@@ -88,41 +88,6 @@ Listings Query
 COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ```
 
-#### DBMS Benchmarking
-
-##### GET REQUESTS
-
-- **URL:** '/listing?data={listId}
-- **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
-- **Data:** 'res.rows' object.
-- **Format:**
-
-```javascript
-[
-  {
-    id: 110417,
-    username: 'Jolie.Cronin',
-    date: 'April 2020',
-    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/m4rio/128.jpg',
-    text:
-      'Mollitia aperiam distinctio ducimus. Illo vel aliquam at ut dicta ut corrupti distinctio. Cupiditate minus est qui id sunt cum reiciendis praesentium. Numquam libero repellat corrupti.',
-    listing_id: 10456,
-    communication: '3.3',
-    checkin: '1.6',
-    value: '4.6',
-    accuracy: '1.8',
-    location: '2.2',
-    cleanliness: '2.8',
-  },
-];
-```
-
-##### POST REQUESTS
-
-##### PUT REQUESTS
-
-##### DELETE REQUESTS
-
 #### Implementing CouchDB
 
 Relevant Docs
@@ -159,7 +124,7 @@ Relevant docs
 - **Added header to CSV** current script does not generate header
 - downloaded NPM package `couchimport`
 - used script
-  - `curl -X PUT http://localhost:5984/{documentName}`
+  - `curl -X PUT http://{username:password}localhost:5984/{documentName}`
   - to create document abreviews
 - used script
   - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’`
@@ -168,3 +133,40 @@ Relevant docs
 - Data small data set successfully Seeded!
 
 ##### Seed Large data set
+
+- Used same script for Large data set and was seeded successfully!
+
+#### DBMS Benchmarking PostgreSQL
+
+##### GET REQUESTS
+
+- **URL:** '/listing?data={listId}
+- **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
+- **Data:** 'res.rows' object.
+- **Format:**
+
+```javascript
+[
+  {
+    id: 110417,
+    username: 'Jolie.Cronin',
+    date: 'April 2020',
+    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/m4rio/128.jpg',
+    text:
+      'Mollitia aperiam distinctio ducimus. Illo vel aliquam at ut dicta ut corrupti distinctio. Cupiditate minus est qui id sunt cum reiciendis praesentium. Numquam libero repellat corrupti.',
+    listing_id: 10456,
+    communication: '3.3',
+    checkin: '1.6',
+    value: '4.6',
+    accuracy: '1.8',
+    location: '2.2',
+    cleanliness: '2.8',
+  },
+];
+```
+
+##### POST REQUESTS
+
+##### PUT REQUESTS
+
+##### DELETE REQUESTS
