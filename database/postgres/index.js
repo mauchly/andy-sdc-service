@@ -9,6 +9,8 @@ const client = new Client({
   port: 5432,
 });
 
-client.connect();
+client.connect(() => {
+  console.log('connected to db!');
+});
 
 module.exports = client;
