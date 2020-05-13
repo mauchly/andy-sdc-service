@@ -9,8 +9,6 @@ require('events').EventEmitter.defaultMaxListeners = 10;
 
 // let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
 let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
-let reviewsHeader =
-  "'id', 'username', 'date', 'avatar', 'text', 'listing_id', 'communication', 'checkin', 'value', 'accuracy', 'location', 'cleanliness'\n";
 
 //==================================
 // Helper Funcs for randYear and decimal floats
@@ -46,10 +44,12 @@ const listingQueryStr = (startIdx, endIdx) => {
 //==================================
 // Create Reviews Query String func
 //==================================
+let reviewsHeader =
+  "'id', 'username', 'date', 'avatar', 'text', 'listing_id', 'communication', 'checkin', 'value', 'accuracy', 'location', 'cleanliness'\n";
 
 const reviewStrGen = (reviewId, listingId) => {
   let date = faker.date.month() + ' ' + randYear();
-  return `${reviewId}, ${faker.internet.userName()}', '${date}', '${faker.image.avatar()}', '${faker.lorem.sentence()}', ${listingId}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}\n`;
+  return `${reviewId}, '${faker.internet.userName()}', '${date}', '${faker.image.avatar()}', '${faker.lorem.sentence()}', ${listingId}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}\n`;
 };
 
 let reviewIdGlobal = 1;
@@ -107,4 +107,13 @@ const createCSV = (dataGenFunc, stream) => {
 //==================================
 // PSQL Command
 //==================================
-// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '/Users/narendragala/Desktop/HackReactor/SDC/andy-sdc-service/data/myOutputReviewsLarge.csv' DELIMITER ',' CSV HEADER;
+// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{filePath.csv}' DELIMITER ',' CSV HEADER;
+
+//==================================
+// CouchDB Command
+//==================================
+// create couchDB document
+// curl -X PUT http://{username:password}@localhost:5984/{dbName}
+
+// Seed couchDB from CSV
+//cat {csvFilePath} | couchimport --url http://{username:password}@localhost:5984 --db abreviews
