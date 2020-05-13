@@ -8,7 +8,7 @@ const fs = require('fs');
 require('events').EventEmitter.defaultMaxListeners = 10;
 
 let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
-let reviewsStream = fs.createWriteStream('../../data/myOutputReviews.csv');
+let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
 
 //==================================
 // Helper Funcs for randYear and decimal floats
