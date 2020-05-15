@@ -235,3 +235,44 @@ SUCCESS!!
 ### DBMS Benchmarking CouchDB
 
 GET REQUESTS
+
+- Used Mango Query to query CouchDB
+- `Executed in 20 ms`
+
+Ran query again
+
+- `Executed in 14 ms`
+
+Did not notice a significant difference in query speed when query was run multiple times.
+
+### Postgres vs CouchDB
+
+#### Postgres
+
+Pros:
+
+- Postgres is a bit slower on first query however is exponentially faster on subsequent queries.
+- Rich documentation available on line, lots of resources on Stack overflow and youtube. Feel if I need help or run into problems down the line, the rich resource library will be very useful.
+- Can implement ORM with Sequelize.
+- Large adoption within the dev community.
+
+Cons:
+
+- Some parts of the documentation can be dense.
+- Syntax can be quirky
+
+#### CouchDB
+
+Pros
+
+- Slightly faster on first query but stays constant on subsequent queries.
+- Nice GUI called "Fauxton" which can be a better experience however Postgres also has one called pgAdmin.
+- After initial learning curve is a fairly smooth experience.
+
+Cons
+
+- Lack of documentation, poor resources. This can be very problematic down the line...
+- Steep learning curve.
+- Low adoption from dev community.
+
+#### Recommendation: POSTGRES
