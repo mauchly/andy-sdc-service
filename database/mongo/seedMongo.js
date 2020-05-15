@@ -4,7 +4,7 @@
 
 const Reviews = require('./index.js');
 const mongoose = require('mongoose');
-const url = ''; //Add Atlas url
+const url = require('../database.config').dbUrl;
 
 mongoose.connect(url, {
   useUnifiedTopology: true,

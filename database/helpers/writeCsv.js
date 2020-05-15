@@ -7,10 +7,8 @@ const fs = require('fs');
 //To prevent memory leak when dealing with multiple events
 require('events').EventEmitter.defaultMaxListeners = 10;
 
-// let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
-let reviewsStream = fs.createWriteStream(
-  '../../data/myOutputReviewsLargeCouch.csv'
-);
+let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
+let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
 
 //==================================
 // Helper Funcs for randYear and decimal floats
@@ -31,14 +29,14 @@ const floatNum = () => {
 //==================================
 // Create Listings Query String func
 //==================================
-const listingQueryStr = (startIdx, endIdx) => {
-  let listingStr = '';
+let listingHeader = `id\n`;
 
+const listingQueryStr = (startIdx) => {
+  let listingStr = '';
+  let endIdx = startIdx + 9999;
   for (let i = startIdx; i <= endIdx; i++) {
     listingStr += i + '\n';
   }
-
-  listingStr = listingStr.slice(0, -1);
 
   return listingStr;
 };
@@ -75,12 +73,12 @@ const createReviews = (idxBlock) => {
 // CSV Generator for CSV file
 //==================================
 
-const createCSV = (dataGenFunc, stream) => {
+const createCSV = (dataGenFunc, stream, header) => {
   let listId = 1;
 
   // First 10K entries
   let entryStr = dataGenFunc(listId);
-  stream.write(reviewsHeader);
+  stream.write(header);
   let ok = stream.write(entryStr);
   if (!ok) {
     stream.once('drain', dataGenFunc);
@@ -103,8 +101,8 @@ const createCSV = (dataGenFunc, stream) => {
   stream.end();
 };
 
-// createCSV(createReviews, reviewsStream);
-// createCSV(listingQueryStr, listingsStream);
+// createCSV(createReviews, reviewsStream, reviewsHeader);
+// createCSV(listingQueryStr, listingsStream, listingHeader);
 
 //==================================
 // PSQL Command
