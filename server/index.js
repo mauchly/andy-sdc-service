@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 // const Reviews = require('../database/mongo');
 const client = require('../database/postgres/index');
 var expressStaticGzip = require('express-static-gzip');
+const postgresDataSyntax = require('./helpers');
 
 let app = express();
-
+app.use(cors());
 // app.use(express.static('public'));
 app.use(express.text());
 app.use(express.json());
@@ -21,44 +23,87 @@ app.use(
 );
 
 //For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
-app.get('/averageScore:id', (req, res) => {
+app.get('/averageScore/:id', (req, res) => {
   let listId = req.params.id;
 
-  Reviews.find({ id: listId }, (err, result) => {
-    if (err) {
-      console.log('error in averageScore', err);
-      res.sendStatus(404);
-    } else {
-      if (result.length === 0) {
-        return 0;
-      }
-      let finalScore = 0;
-      let helperScore = 0;
-      let reviews = result[0].reviews;
-      let reviewNumber = reviews.length;
-      for (let i = 0; i < reviews.length; i++) {
-        let scores = reviews[i].scores[0];
+  //=======================================
+  // POSTGRES QUERY
+  //=======================================
+  client.query(
+    `SELECT * FROM reviews where listing_id = ${listId};`,
+    (err, result) => {
+      result = postgresDataSyntax(result.rows);
 
-        helperScore += +scores.cleanliness;
-        helperScore += +scores.communication;
-        helperScore += +scores.checkin;
-        helperScore += +scores.accuracy;
-        helperScore += +scores.location;
-        helperScore += +scores.value;
-
-        finalScore += helperScore / 6;
-        helperScore = 0;
+      if (err) {
+        console.log('error in averageScore', err);
+        res.sendStatus(404);
+      } else {
+        if (result.length === 0) {
+          return 0;
+        }
+        let finalScore = 0;
+        let helperScore = 0;
+        let reviews = result[0].reviews;
+        let reviewNumber = reviews.length;
+        for (let i = 0; i < reviews.length; i++) {
+          let scores = reviews[i].scores[0];
+          helperScore += +scores.cleanliness;
+          helperScore += +scores.communication;
+          helperScore += +scores.checkin;
+          helperScore += +scores.accuracy;
+          helperScore += +scores.location;
+          helperScore += +scores.value;
+          finalScore += helperScore / 6;
+          helperScore = 0;
+        }
+        res.end(
+          `${(finalScore / reviews.length)
+            .toFixed(2)
+            .toString()}, (${reviewNumber} reviews)`
+        );
       }
-      res.end(
-        `${(finalScore / reviews.length)
-          .toFixed(2)
-          .toString()}, (${reviewNumber} reviews)`
-      );
     }
-  });
+  );
+
+  //=======================================
+  // MONGO QUERY
+  //=======================================
+
+  // Reviews.find({ id: listId }, (err, result) => {
+  //   if (err) {
+  //     console.log('error in averageScore', err);
+  //     res.sendStatus(404);
+  //   } else {
+  //     if (result.length === 0) {
+  //       return 0;
+  //     }
+  //     let finalScore = 0;
+  //     let helperScore = 0;
+  //     let reviews = result[0].reviews;
+  //     let reviewNumber = reviews.length;
+  //     for (let i = 0; i < reviews.length; i++) {
+  //       let scores = reviews[i].scores[0];
+
+  //       helperScore += +scores.cleanliness;
+  //       helperScore += +scores.communication;
+  //       helperScore += +scores.checkin;
+  //       helperScore += +scores.accuracy;
+  //       helperScore += +scores.location;
+  //       helperScore += +scores.value;
+
+  //       finalScore += helperScore / 6;
+  //       helperScore = 0;
+  //     }
+  //     res.end(
+  //       `${(finalScore / reviews.length)
+  //         .toFixed(2)
+  //         .toString()}, (${reviewNumber} reviews)`
+  //     );
+  //   }
+  // });
 });
 
-//Get listing by either id or name
+//Get listing by id
 app.get('/listing', async (req, res) => {
   let listId = req.query.data || 10001;
 
@@ -73,8 +118,9 @@ app.get('/listing', async (req, res) => {
     `SELECT * FROM reviews where listing_id = ${listId};`
   );
 
-  console.log(data.rows);
-  res.send(data.rows);
+  let reviews = postgresDataSyntax(data.rows);
+  res.send(reviews);
+
   //=======================================
   // MONGO QUERY
   //=======================================
