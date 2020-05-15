@@ -190,6 +190,8 @@ Ran query:
 CREATE INDEX idx_listing_id ON reviews(listing_id);
 ```
 
+GET REQUEST
+
 ```SQL
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
 ```
@@ -202,6 +204,34 @@ Ran SELECT query again and got:
 - `Planning Time: 0.087 ms`
 - `Execution Time: 0.042 ms`
 
+POST REQUEST
+***Two part***
+
+- have to create a new listing
+- then can create new review
+***Due to foreign key constraint***
+
+Create new listing
+
+```SQL
+  EXPLAIN ANALYZE INSERT INTO listings(id) VALUES(10000003);
+```
+
+- `Planning Time: 0.021 ms`
+- `Execution Time: 0.091 ms`
+
+Create new review
+
+```SQL
+  EXPLAIN ANALYZE INSERT INTO reviews(id, listing_id, username, date, avatar, text, communication, checkin, value, accuracy, location, cleanliness) VALUES(25000983, 10000003, 'test3', 'December 2020', 'https://s3.amazonaws.com/uifaces/faces/twitter/scrapdnb/130.jpg', 'laksdjfalksdjaa', 3.6, 3.5, 5.0, 3.1, 4.2, 5.0);
+```
+
+- `Planning Time: 0.069 ms`
+- `Trigger for constraint reviews_listing_id_fkey: time=0.126 calls=1`
+- `Execution Time: 34.482 ms`
+
 SUCCESS!!
 
 ### DBMS Benchmarking CouchDB
+
+GET REQUESTS
