@@ -8,7 +8,9 @@ const fs = require('fs');
 require('events').EventEmitter.defaultMaxListeners = 10;
 
 // let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
-let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
+let reviewsStream = fs.createWriteStream(
+  '../../data/myOutputReviewsSmallCouch.csv'
+);
 
 //==================================
 // Helper Funcs for randYear and decimal floats
@@ -58,7 +60,7 @@ const createReviews = (idxBlock) => {
   let reviewStr = '';
   const random = () => Math.floor(Math.random() * (4 - 1 + 1) + 1);
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 100; i++) {
     let randomNum = random();
 
     for (let j = 0; j < randomNum; j++) {
@@ -84,8 +86,8 @@ const createCSV = (dataGenFunc, stream) => {
     stream.once('drain', dataGenFunc);
   }
 
-  for (let i = 1; i < 1000; i++) {
-    listId += 10000;
+  for (let i = 1; i < 10; i++) {
+    listId += 100;
     let entryStr = dataGenFunc(listId);
     let ok = stream.write(entryStr);
     if (!ok) {
@@ -93,7 +95,7 @@ const createCSV = (dataGenFunc, stream) => {
     }
 
     console.log('Current iteration: ', listId);
-    if (reviewIdGlobal > 30000000) {
+    if (reviewIdGlobal > 300000) {
       break;
     }
   }
@@ -101,7 +103,7 @@ const createCSV = (dataGenFunc, stream) => {
   stream.end();
 };
 
-// createCSV(createReviews, reviewsStream);
+createCSV(createReviews, reviewsStream);
 // createCSV(listingQueryStr, listingsStream);
 
 //==================================
@@ -114,6 +116,8 @@ const createCSV = (dataGenFunc, stream) => {
 //==================================
 // create couchDB document
 // curl -X PUT http://{username:password}@localhost:5984/{dbName}
+// curl -X PUT http://admin:password@localhost:5984/abreviews
 
 // Seed couchDB from CSV
 //cat {csvFilePath} | couchimport --url http://{username:password}@localhost:5984 --db abreviews
+//cat myOutputReviewsLarge.csv | couchimport --url http://admin:password@localhost:5984 --db abreviews
