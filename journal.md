@@ -1,8 +1,8 @@
 # Engineering Journal SDC Reviews Service
 
-# Phase 1 Scale the DB
+## Phase 1 Scale the DB
 
-## Support CRUD with MONGO DB
+### Support CRUD with MONGO DB
 
 Refactored database files and Models to use Mongodb atlas
 Set up POST PUT DELETE. GET was already set up from initial code
@@ -10,7 +10,7 @@ Set up POST PUT DELETE. GET was already set up from initial code
 **Observations/Next steps**
 Need to completely refactor to connect to Postgres
 
-## DBMS Selection and Data Generation
+### DBMS Selection and Data Generation
 
 - Postgres and CouchDB
 
@@ -23,7 +23,7 @@ _Still unsure if I want to implement Sequelize as will make DB more fluid if nee
 
 _Thinking I should just use Sequelize as it will abstract out schema design and querying using SQL. This may save more time?_
 
-### Setting up Sequelize
+#### Setting up Sequelize
 
 - npm install sequelize pg --save
 
@@ -63,11 +63,9 @@ _Decided to just use Postgres and skip Sequelize for now. Adding too much comple
 
 Relevant Docs
 
-> https://www.postgresql.org/docs/current/populate.html
-
-> https://nodejs.org/api/stream.html#stream_event_drain
-
-> https://thoughtbot.com/blog/reading-an-explain-analyze-query-plan
+<https://www.postgresql.org/docs/current/populate.html>
+<https://nodejs.org/api/stream.html#stream_event_drain>
+<https://thoughtbot.com/blog/reading-an-explain-analyze-query-plan>
 
 - Refactored helper funcs and created seed scripts
 - Data can be successfully seed at 10k - 100k entries
@@ -90,37 +88,191 @@ Listings Query
 COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ```
 
-## DBMS Benchmarking
+### Implementing CouchDB
 
-### GET REQUESTS
+Relevant Docs
 
-- **URL:** '/listing?data={listId}
-- **Query string:** 'SELECT listings.id, reviews.\* FROM listings, reviews WHERE listings.id = \${listId} AND listings.id = reviews.listing_id;'
-- **Data:** 'res.rows' object.
-- **Format:**
+<https://docs.couchdb.org/en/stable/index.html>
+<https://www.youtube.com/watch?v=nlqv9Np3iAU>
 
-```javascript
-[
-  {
-    id: 110417,
-    username: 'Jolie.Cronin',
-    date: 'April 2020',
-    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/m4rio/128.jpg',
-    text:
-      'Mollitia aperiam distinctio ducimus. Illo vel aliquam at ut dicta ut corrupti distinctio. Cupiditate minus est qui id sunt cum reiciendis praesentium. Numquam libero repellat corrupti.',
-    listing_id: 10456,
-    communication: '3.3',
-    checkin: '1.6',
-    value: '4.6',
-    accuracy: '1.8',
-    location: '2.2',
-    cleanliness: '2.8',
-  },
-];
+#### Hello DB
+
+- Downloaded and installed couch db
+- Used GUI Fixation to interact with DB
+- Set up testdb as cluster as this will help with faster querying for large data sets.
+- Set up partition key with creating test documents. Set key as id.
+
+``` javascript
+{
+  "_id": "{PARTITION KEY}:72e8bdde44adc8fc4a1b3fedba0086c5",
+  "id": 1,
+  "name": "testName1",
+  "text": "alskdfaslkjdfalskdjfalksdjfaskdfja",
+  "listing_id": 8
+}
 ```
 
-### POST REQUESTS
+#### Migrate CSV to Couch DB
 
-### PUT REQUESTS
+Relevant docs
+<https://www.npmjs.com/package/couchimport>
 
-### DELETE REQUESTS
+<https://medium.com/codait/simple-csv-import-for-couchdb-71616200b095>
+
+#### Seed small Data set
+
+- Created small data set `myOutputReviewsSmall.csv` with 1000 entries to test migration.
+- **Added header to CSV** current script does not generate header
+- downloaded NPM package `couchimport`
+- used script
+  - `curl -X PUT http://{username:password}@localhost:5984/{documentName}`
+  - to create document abreviews
+- used script
+  - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’ CSV HEADER`
+  - to seed small data set.
+
+- Data small data set successfully Seeded!
+
+#### Seed Large data set
+
+- Used same script for Large data set and was seeded successfully!
+
+### DBMS Benchmarking PostgreSQL
+
+#### Initial query speeds
+
+Query:
+
+``` SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE id = 24000000;
+```
+
+- `Planning Time: 0.694 ms`
+- `Execution Time: 25.541 ms`
+
+Ran same query again and speeds were significantly faster.
+
+- `Planning Time: 0.079 ms`
+- `Execution Time: 0.038 ms`
+
+**Issue: when querying reviews based on foreign key `listing_id` performnce is significantly slower**
+
+```SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
+```
+
+- `Planning Time: 0.089 ms`
+- `Execution Time: 84658.076 ms`
+
+Made no difference if I ran it again still querying very slow.
+
+**Research**
+Looked into posgres VACUUM
+
+Ran query:
+
+```SQL
+VACUUM(FULL, ANALYZE, VERBOSE) reviews;
+```
+
+- still slow, no effect on query speed.
+- doc ref: <https://confluence.atlassian.com/kb/optimize-and-improve-postgresql-performance-with-vacuum-analyze-and-reindex-885239781.html>
+
+Looked into creating an index on my foreign key
+
+- doc ref:
+  - <https://www.postgresql.org/docs/9.1/sql-createindex.html>
+  - <https://www.youtube.com/watch?v=19eLh1ZdoLY>
+
+Ran query:
+
+```SQL
+CREATE INDEX idx_listing_id ON reviews(listing_id);
+```
+
+GET REQUEST
+
+```SQL
+EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
+```
+
+- `Planning Time: 0.092 ms`
+- `Execution Time: 26.683 ms`
+
+Ran SELECT query again and got:
+
+- `Planning Time: 0.087 ms`
+- `Execution Time: 0.042 ms`
+
+POST REQUEST
+***Two part***
+
+- have to create a new listing
+- then can create new review
+***Due to foreign key constraint***
+
+Create new listing
+
+```SQL
+  EXPLAIN ANALYZE INSERT INTO listings(id) VALUES(10000003);
+```
+
+- `Planning Time: 0.021 ms`
+- `Execution Time: 0.091 ms`
+
+Create new review
+
+```SQL
+  EXPLAIN ANALYZE INSERT INTO reviews(id, listing_id, username, date, avatar, text, communication, checkin, value, accuracy, location, cleanliness) VALUES(25000983, 10000003, 'test3', 'December 2020', 'https://s3.amazonaws.com/uifaces/faces/twitter/scrapdnb/130.jpg', 'laksdjfalksdjaa', 3.6, 3.5, 5.0, 3.1, 4.2, 5.0);
+```
+
+- `Planning Time: 0.069 ms`
+- `Trigger for constraint reviews_listing_id_fkey: time=0.126 calls=1`
+- `Execution Time: 34.482 ms`
+
+SUCCESS!!
+
+### DBMS Benchmarking CouchDB
+
+GET REQUESTS
+
+- Used Mango Query to query CouchDB
+- `Executed in 20 ms`
+
+Ran query again
+
+- `Executed in 14 ms`
+
+Did not notice a significant difference in query speed when query was run multiple times.
+
+### Postgres vs CouchDB
+
+#### Postgres
+
+Pros:
+
+- Postgres is a bit slower on first query however is exponentially faster on subsequent queries.
+- Rich documentation available on line, lots of resources on Stack overflow and youtube. Feel if I need help or run into problems down the line, the rich resource library will be very useful.
+- Can implement ORM with Sequelize.
+- Large adoption within the dev community.
+
+Cons:
+
+- Some parts of the documentation can be dense.
+- Syntax can be quirky
+
+#### CouchDB
+
+Pros
+
+- Slightly faster on first query but stays constant on subsequent queries.
+- Nice GUI called "Fauxton" which can be a better experience however Postgres also has one called pgAdmin.
+- After initial learning curve is a fairly smooth experience.
+
+Cons
+
+- Lack of documentation, poor resources. This can be very problematic down the line...
+- Steep learning curve.
+- Low adoption from dev community.
+
+#### Recommendation: POSTGRES

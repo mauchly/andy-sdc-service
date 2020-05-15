@@ -7,8 +7,10 @@ const fs = require('fs');
 //To prevent memory leak when dealing with multiple events
 require('events').EventEmitter.defaultMaxListeners = 10;
 
-let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
-let reviewsStream = fs.createWriteStream('../../data/myOutputReviews.csv');
+// let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
+let reviewsStream = fs.createWriteStream(
+  '../../data/myOutputReviewsLargeCouch.csv'
+);
 
 //==================================
 // Helper Funcs for randYear and decimal floats
@@ -44,58 +46,77 @@ const listingQueryStr = (startIdx, endIdx) => {
 //==================================
 // Create Reviews Query String func
 //==================================
-const createReviewQueryStr = (listingId, num) => {
-  let reviewStr = '';
+let reviewsHeader =
+  'id,username,date,avatar,text,listing_id,communication,checkin,value,accuracy,location,cleanliness\n';
 
-  for (let i = 0; i < num; i++) {
-    let date = faker.date.month() + ' ' + randYear();
-    reviewStr += `'${faker.internet.userName()}', '${date}', '${faker.image.avatar()}', '${faker.lorem.sentence()}', ${listingId}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}, ${floatNum()}\n`;
-  }
-
-  return reviewStr;
+const reviewStrGen = (reviewId, listingId) => {
+  let date = faker.date.month() + ' ' + randYear();
+  return `${reviewId},${faker.internet.userName()},${date},${faker.image.avatar()},${faker.lorem.sentence()},${listingId},${floatNum()},${floatNum()},${floatNum()},${floatNum()},${floatNum()},${floatNum()}\n`;
 };
 
-const totalReviewsQueryString = (id) => {
+let reviewIdGlobal = 1;
+
+const createReviews = (idxBlock) => {
+  let reviewStr = '';
   const random = () => Math.floor(Math.random() * (4 - 1 + 1) + 1);
 
-  let reviewStrTotal = '';
-
   for (let i = 0; i < 10000; i++) {
-    reviewStrTotal += createReviewQueryStr(i + id, random());
-  }
+    let randomNum = random();
 
-  return reviewStrTotal;
+    for (let j = 0; j < randomNum; j++) {
+      reviewStr += reviewStrGen(reviewIdGlobal, idxBlock + i);
+      reviewIdGlobal++;
+    }
+  }
+  return reviewStr;
 };
 
 //==================================
 // CSV Generator for CSV file
 //==================================
 
-const createCSV = (entries, stream) => {
+const createCSV = (dataGenFunc, stream) => {
   let listId = 1;
 
   // First 10K entries
-  let entryStr = entries(listId);
+  let entryStr = dataGenFunc(listId);
+  stream.write(reviewsHeader);
   let ok = stream.write(entryStr);
+  if (!ok) {
+    stream.once('drain', dataGenFunc);
+  }
 
   for (let i = 1; i < 1000; i++) {
     listId += 10000;
-    let entryStr = entries(listId);
+    let entryStr = dataGenFunc(listId);
     let ok = stream.write(entryStr);
     if (!ok) {
-      stream.once('drain', dataFunc);
+      stream.once('drain', dataGenFunc);
     }
 
-    console.log('Current iteration: ', listingId);
+    console.log('Current iterations: ', listId);
+    if (reviewIdGlobal > 30000000) {
+      break;
+    }
   }
 
   stream.end();
 };
 
-// createCSV(totalReviewsQueryString, reviewsStream);
+// createCSV(createReviews, reviewsStream);
 // createCSV(listingQueryStr, listingsStream);
 
 //==================================
 // PSQL Command
 //==================================
-// copy reviews(username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from {csvFile} DELIMITER ',' CSV;
+// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{filePath.csv}' DELIMITER ',' CSV HEADER;
+
+//==================================
+// CouchDB Command
+//==================================
+// create couchDB document
+// curl -X PUT http://{username:password}@localhost:5984/{dbName}
+
+// Seed couchDB from CSV
+// cat {csvFilePath} | couchimport --url http://{username:password}@localhost:5984 --db abreviews
+// cat myOutputReviewsLargeCouch.csv | couchimport --url http://{username:password}@localhost:5984 --db abreviews --delimiter ','
