@@ -59,7 +59,7 @@ app.get('/averageScore:id', (req, res) => {
 });
 
 //Get listing by either id or name
-app.get('/listing', (req, res) => {
+app.get('/listing', async (req, res) => {
   let listId = req.query.data || 10001;
 
   let reg = /\d{5}/;
@@ -69,14 +69,12 @@ app.get('/listing', (req, res) => {
   //=======================================
   // POSTGRES QUERY
   //=======================================
-  console.log(listId);
-  client
-    .query(`SELECT * FROM reviews where listing_id = ${listId};`)
-    .then((res) => {
-      console.log(res.rows);
-      res.send(res.rows);
-    });
+  const data = await client.query(
+    `SELECT * FROM reviews where listing_id = ${listId};`
+  );
 
+  console.log(data.rows);
+  res.send(data.rows);
   //=======================================
   // MONGO QUERY
   //=======================================
@@ -105,15 +103,51 @@ app.get('/listing', (req, res) => {
 });
 
 //Post listing
-app.post('/listing', (req, res) => {
-  Reviews.create(req.body, (err, entry) => {
-    if (err) {
-      console.log(err);
-      res.sendStatus(400);
-    } else {
-      res.send(entry);
-    }
-  });
+app.post('/listing', async (req, res) => {
+  //=======================================
+  // POSTGRES QUERY
+  //=======================================
+
+  // Create new {id} for new review
+  let maxId = await (await client.query('SELECT max(id) FROM reviews')).rows[0]
+    .max;
+  const newId = ++maxId;
+
+  // Create new {listing_id} for new review
+  let maxListingId = await (
+    await client.query('SELECT max(listing_id) FROM reviews')
+  ).rows[0].max;
+  const newListingId = ++maxListingId;
+
+  // Create query string for columns and values with new {id} and {listing_id}
+  let columns = `id, listing_id, ${Object.keys(req.body).join(', ')}`;
+  let values = `${newId}, ${newListingId}, ${Object.values(req.body)
+    .map((entry, i) => (i < 4 ? `'${entry}'` : entry))
+    .join(', ')}`;
+
+  console.log(`INSERT INTO reviews(${columns}) VALUES(${values});`);
+  // const queryResListing = await client.query(
+  //   `INSERT INTO listings(id) VALUES(${newListingId})`
+  // );
+
+  // const queryResReview = await client.query(
+  //   `INSERT INTO reviews(${columns}) VALUES(${values});`
+  // );
+
+  // res.send([queryResListing, queryResReview]);
+
+  //=======================================
+  // MONGO QUERY
+  //=======================================
+
+  // Reviews.create(req.body, (err, entry) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.sendStatus(400);
+  //   } else {
+  //     res.send(entry);
+  //   }
+  // });
 });
 
 //put listing
