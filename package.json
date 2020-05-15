@@ -15,6 +15,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-static-gzip": "^2.0.6",
     "faker": "^4.1.0",
