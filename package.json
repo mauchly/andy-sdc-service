@@ -10,7 +10,7 @@
   "scripts": {
     "build": "webpack --mode=production",
     "react-dev": "webpack -d --watch --mode=development",
-    "server-dev": "nodemon server/index.js",
+    "server-dev": "nodemon server/app.js",
     "seed": "node ./database/seed.js",
     "test": "jest"
   },
@@ -23,6 +23,7 @@
     "mongo-seeding": "^3.4.0",
     "mongodb": "^3.5.4",
     "mongoose": "^5.9.4",
+    "newrelic": "^6.7.1",
     "pg": "^8.0.3",
     "pg-hstore": "^2.3.3",
     "react": "^16.13.0",
