@@ -155,7 +155,7 @@ Ran same query again and speeds were significantly faster.
 - `Planning Time: 0.079 ms`
 - `Execution Time: 0.038 ms`
 
-**Issue: when querying reviews based on foreign key `listing_id` performnce is significantly slower**
+**Issue: when querying reviews based on foreign key `listing_id` performance is significantly slower**
 
 ```SQL
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
@@ -276,3 +276,143 @@ Cons
 - Low adoption from dev community.
 
 #### Recommendation: POSTGRES
+
+## Phase 2 Measure Initial Performance
+
+### Install New Relic
+
+- Set up account and save `key`
+- Had to rename server.js to app.js because new relic config was looking for app.js
+- Copied `newrelic.js` file from node modules and inserted `key` and `app-name`. Added `newrelic.js` to server folder in main directory.
+- Updated `.gitignore` to not add `newrelic.js` as it contained newrelic service `key`.
+- New relic dashboard benchmarking `app.js`.
+
+#### Clustering Node js server
+
+Relevant Docs:
+<https://www.youtube.com/watch?v=w1IzRF6AkuI>
+<https://www.youtube.com/watch?v=6xIbVPyh9wo>
+
+Need to cluster app. Clustering allows cpu to use multiple cores. This allows for higher traffic processing.
+
+- Create `cluster.js` file in server folder.
+- Add in code
+
+```Javascript
+const newrelic = require('newrelic');
+const cluster = require('cluster');
+
+// If the process is the Master Process than fork off n-cores clusters available
+if (cluster.isMaster) {
+  // Count the machine's CPUs
+  var cpuCount = require('os').cpus().length;
+
+  // Create a worker for each CPU
+  for (var i = 0; i < cpuCount; i += 1) {
+    cluster.fork();
+  }
+
+  // Listen for dying workers
+  cluster.on('exit', function () {
+    cluster.fork();
+  });
+} else {
+  // If cluster is worker process then run instance of app.js
+  require('./app');
+}
+```
+
+- Run `node cluster.js` instead of `npm run server-dev` to start cluster server.
+
+#### Stress Test Server with 1, 10, 100, 1000 RPS
+
+Relevant Docs: <https://artillery.io/docs/getting-started>
+
+- Looked at k6m, Jmeter and Artillery for stress testing.
+- Decided to go with Artillery.
+
+- `npm install -g artillery`
+
+**1 Request**
+
+Terminal Command: `artillery quick --count 1 -n 1 http://localhost:3004/9000618`
+
+```
+  Scenarios launched:  1
+  Scenarios completed: 1
+  Requests completed:  1
+  Mean response/sec: 2.13
+  Response time (msec):
+    min: 6.7
+    max: 6.7
+    median: 6.7
+    p95: 6.7
+    p99: 6.7
+  Scenario counts:
+    0: 1 (100%)
+  Codes:
+    200: 1
+```
+
+**10 Requests**
+
+Terminal Command: `artillery quick --count 10 -n 1 http://localhost:3004/9000618`
+
+```
+  Scenarios launched:  10
+  Scenarios completed: 10
+  Requests completed:  10
+  Mean response/sec: 7.3
+  Response time (msec):
+    min: 2
+    max: 6.4
+    median: 2.3
+    p95: 6.4
+    p99: 6.4
+  Scenario counts:
+    0: 10 (100%)
+  Codes:
+    200: 10
+```
+
+**100 Requests**
+
+Terminal Command: `artillery quick --count 10 -n 10 http://localhost:3004/9000618`
+
+```
+  Scenarios launched:  10
+  Scenarios completed: 10
+  Requests completed:  100
+  Mean response/sec: 72.46
+  Response time (msec):
+    min: 0.8
+    max: 4.6
+    median: 1.2
+    p95: 2.6
+    p99: 4.1
+  Scenario counts:
+    0: 10 (100%)
+  Codes:
+    200: 100
+```
+
+**1000 Requests**
+
+Terminal Command: `artillery quick --count 10 -n 100 http://localhost:3004/9000618`
+
+```
+  Scenarios launched:  10
+  Scenarios completed: 10
+  Requests completed:  1000
+  Mean response/sec: 719.42
+  Response time (msec):
+    min: 0.8
+    max: 6.8
+    median: 2.3
+    p95: 4
+    p99: 5.4
+  Scenario counts:
+    0: 10 (100%)
+  Codes:
+    200: 1000
+```
