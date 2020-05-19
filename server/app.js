@@ -26,9 +26,6 @@ app.use(
 app.get('/averageScore/:id', (req, res) => {
   let listId = req.params.id;
 
-  //=======================================
-  // POSTGRES QUERY
-  //=======================================
   client.query(
     `SELECT * FROM reviews where listing_id = ${listId};`,
     (err, result) => {
@@ -64,43 +61,6 @@ app.get('/averageScore/:id', (req, res) => {
       }
     }
   );
-
-  //=======================================
-  // MONGO QUERY
-  //=======================================
-
-  // Reviews.find({ id: listId }, (err, result) => {
-  //   if (err) {
-  //     console.log('error in averageScore', err);
-  //     res.sendStatus(404);
-  //   } else {
-  //     if (result.length === 0) {
-  //       return 0;
-  //     }
-  //     let finalScore = 0;
-  //     let helperScore = 0;
-  //     let reviews = result[0].reviews;
-  //     let reviewNumber = reviews.length;
-  //     for (let i = 0; i < reviews.length; i++) {
-  //       let scores = reviews[i].scores[0];
-
-  //       helperScore += +scores.cleanliness;
-  //       helperScore += +scores.communication;
-  //       helperScore += +scores.checkin;
-  //       helperScore += +scores.accuracy;
-  //       helperScore += +scores.location;
-  //       helperScore += +scores.value;
-
-  //       finalScore += helperScore / 6;
-  //       helperScore = 0;
-  //     }
-  //     res.end(
-  //       `${(finalScore / reviews.length)
-  //         .toFixed(2)
-  //         .toString()}, (${reviewNumber} reviews)`
-  //     );
-  //   }
-  // });
 });
 
 //Get listing by id
@@ -111,49 +71,16 @@ app.get('/listing', async (req, res) => {
   //test to see if id num or listing string
   let result = reg.test(listId);
 
-  //=======================================
-  // POSTGRES QUERY
-  //=======================================
   const data = await client.query(
     `SELECT * FROM reviews where listing_id = ${listId};`
   );
 
   let reviews = postgresDataSyntax(data.rows);
   res.send(reviews);
-
-  //=======================================
-  // MONGO QUERY
-  //=======================================
-
-  //if text of listing...
-  // if (!result) {
-  //   Reviews.find({ name: listId }, (err, result) => {
-  //     if (err) {
-  //       console.log('error in Reviews.find', err);
-  //       res.sendStatus(404);
-  //     } else {
-  //       res.send(result);
-  //     }
-  //   });
-  //   //else if id of listing...
-  // } else {
-  //   Reviews.find({ id: listId }, (err, result) => {
-  //     if (err) {
-  //       console.log('error in Reviews.find', err);
-  //       res.sendStatus(404);
-  //     } else {
-  //       res.send(result);
-  //     }
-  //   });
-  // }
 });
 
 //Post listing
 app.post('/listing', async (req, res) => {
-  //=======================================
-  // POSTGRES QUERY
-  //=======================================
-
   // Create new {id} for new review
   let maxId = await (await client.query('SELECT max(id) FROM reviews')).rows[0]
     .max;
@@ -171,57 +98,51 @@ app.post('/listing', async (req, res) => {
     .map((entry, i) => (i < 4 ? `'${entry}'` : entry))
     .join(', ')}`;
 
-  console.log(`INSERT INTO reviews(${columns}) VALUES(${values});`);
-  // const queryResListing = await client.query(
-  //   `INSERT INTO listings(id) VALUES(${newListingId})`
-  // );
+  const queryResListing = await client.query(
+    `INSERT INTO listings(id) VALUES(${newListingId})`
+  );
 
-  // const queryResReview = await client.query(
-  //   `INSERT INTO reviews(${columns}) VALUES(${values});`
-  // );
+  const queryResReview = await client.query(
+    `INSERT INTO reviews(${columns}) VALUES(${values});`
+  );
 
-  // res.send([queryResListing, queryResReview]);
-
-  //=======================================
-  // MONGO QUERY
-  //=======================================
-
-  // Reviews.create(req.body, (err, entry) => {
-  //   if (err) {
-  //     console.log(err);
-  //     res.sendStatus(400);
-  //   } else {
-  //     res.send(entry);
-  //   }
-  // });
+  res.send([queryResListing, queryResReview]);
 });
 
 //put listing
-app.put('/listing/:id', (req, res) => {
-  Reviews.findOneAndUpdate({ id: req.params.id }, req.body, (err, entry) => {
-    if (err) {
-      res.send(400);
-      console.log(err);
-    } else {
-      res.send(entry);
-      console.log('Update Success!');
-    }
-  });
+app.put('/listing/:id', async (req, res) => {
+  const reviewId = parseInt(req.params.id);
+  const sqlSetString = Object.entries(req.body)
+    .map((entry) => {
+      if (
+        entry[0] === 'username' ||
+        entry[0] === 'date' ||
+        entry[0] === 'avatar' ||
+        entry[0] === 'text'
+      ) {
+        return [`${entry[0]} = '${entry[1]}'`];
+      } else {
+        return entry.join(' = ');
+      }
+    })
+    .join(', ');
+
+  const sqlString = `UPDATE reviews SET ${sqlSetString} WHERE id = ${reviewId};`;
+
+  const response = await client.query(sqlString);
+
+  res.send(response);
 });
 
-//delete listing
-app.delete('/listing/:id', (req, res) => {
+// //delete listing
+app.delete('/listing/:id', async (req, res) => {
   console.log(req.params.id);
 
-  Reviews.findOneAndDelete({ id: req.params.id }, (err, entry) => {
-    if (err) {
-      res.send(400);
-      console.log(err);
-    } else {
-      res.send(entry);
-      console.log('Delete Success!');
-    }
-  });
+  const response = await client.query(
+    `DELETE from reviews where listing_id = ${parseInt(req.params.id)}`
+  );
+
+  res.send(response);
 });
 
 //Route to get index.html back after updating state
