@@ -102,7 +102,7 @@ Relevant Docs
 - Set up testdb as cluster as this will help with faster querying for large data sets.
 - Set up partition key with creating test documents. Set key as id.
 
-``` javascript
+```javascript
 {
   "_id": "{PARTITION KEY}:72e8bdde44adc8fc4a1b3fedba0086c5",
   "id": 1,
@@ -128,6 +128,7 @@ Relevant docs
   - `curl -X PUT http://{username:password}@localhost:5984/{documentName}`
   - to create document abreviews
 - used script
+
   - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’ CSV HEADER`
   - to seed small data set.
 
@@ -143,7 +144,7 @@ Relevant docs
 
 Query:
 
-``` SQL
+```SQL
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE id = 24000000;
 ```
 
@@ -205,11 +206,11 @@ Ran SELECT query again and got:
 - `Execution Time: 0.042 ms`
 
 POST REQUEST
-***Two part***
+**_Two part_**
 
 - have to create a new listing
 - then can create new review
-***Due to foreign key constraint***
+  **_Due to foreign key constraint_**
 
 Create new listing
 
@@ -287,6 +288,20 @@ Cons
 - Updated `.gitignore` to not add `newrelic.js` as it contained newrelic service `key`.
 - New relic dashboard benchmarking `app.js`.
 
+#### Install Artillery
+
+Relevant Docs: <https://artillery.io/docs/getting-started>
+
+- Looked at k6m, Jmeter and Artillery for stress testing.
+- Decided to go with Artillery.
+
+- `npm install -g artillery`
+- created a helpers folder in `server` folder and added file `test.yaml`
+- In `test.yaml` duration refers to time/sec that requests will be fired. Arrival rate refers to number of requests per second.
+- Settings:
+  - `duration = 240`
+  - `arrivalRate = 1 || 10 || 100 || 1000`
+
 #### Clustering Node js server
 
 Relevant Docs:
@@ -326,93 +341,51 @@ if (cluster.isMaster) {
 
 #### Stress Test Server with 1, 10, 100, 1000 RPS
 
-Relevant Docs: <https://artillery.io/docs/getting-started>
-
-- Looked at k6m, Jmeter and Artillery for stress testing.
-- Decided to go with Artillery.
-
-- `npm install -g artillery`
+#### Single server
 
 **1 Request**
-
-Terminal Command: `artillery quick --count 1 -n 1 http://localhost:3004/9000618`
-
-```
-  Scenarios launched:  1
-  Scenarios completed: 1
-  Requests completed:  1
-  Mean response/sec: 2.13
-  Response time (msec):
-    min: 6.7
-    max: 6.7
-    median: 6.7
-    p95: 6.7
-    p99: 6.7
-  Scenario counts:
-    0: 1 (100%)
-  Codes:
-    200: 1
-```
+<img src="./photos/1_RPS_ST.png" width="300" >
 
 **10 Requests**
-
-Terminal Command: `artillery quick --count 10 -n 1 http://localhost:3004/9000618`
-
-```
-  Scenarios launched:  10
-  Scenarios completed: 10
-  Requests completed:  10
-  Mean response/sec: 7.3
-  Response time (msec):
-    min: 2
-    max: 6.4
-    median: 2.3
-    p95: 6.4
-    p99: 6.4
-  Scenario counts:
-    0: 10 (100%)
-  Codes:
-    200: 10
-```
+<img src="./photos/10_RPS_ST.png" width="300">
 
 **100 Requests**
-
-Terminal Command: `artillery quick --count 10 -n 10 http://localhost:3004/9000618`
-
-```
-  Scenarios launched:  10
-  Scenarios completed: 10
-  Requests completed:  100
-  Mean response/sec: 72.46
-  Response time (msec):
-    min: 0.8
-    max: 4.6
-    median: 1.2
-    p95: 2.6
-    p99: 4.1
-  Scenario counts:
-    0: 10 (100%)
-  Codes:
-    200: 100
-```
+<img src="./photos/100_RPS_ST.png" width="300">
 
 **1000 Requests**
+<img src="./photos/1K_RPS_ST.png" width="300">
 
-Terminal Command: `artillery quick --count 10 -n 100 http://localhost:3004/9000618`
+##### New Relic Dashboard Single Server
 
-```
-  Scenarios launched:  10
-  Scenarios completed: 10
-  Requests completed:  1000
-  Mean response/sec: 719.42
-  Response time (msec):
-    min: 0.8
-    max: 6.8
-    median: 2.3
-    p95: 4
-    p99: 5.4
-  Scenario counts:
-    0: 10 (100%)
-  Codes:
-    200: 1000
-```
+<img src="./photos/NR_Dashboard_ST_test.png">
+
+#### Cluster
+
+**1 Request**
+<img src="./photos/1_RPS_MT.png" width="300">
+
+**10 Requests**
+<img src="./photos/10_RPS_MT.png" width="300">
+
+**100 Requests**
+<img src="./photos/100_RPS_MT.png" width="300">
+
+**1000 Requests**
+<img src="./photos/1K_RPS_MT.png" width="300">
+
+##### New Relic Dashboard Cluster
+
+<img src="./photos/NewRelicCluster.png">
+
+#### Notes
+
+Cluster vs Single Core
+
+- Seems that below 100-RPS performance is similar between using once instance of server vs clustering. However at 1k-RPS, single instance of server immediately crashes. Cluster server runs but still gets about 4k 500 errors out of 240k requests.
+- First request to postgres is still significantly slower than subsequent requests for both single server and cluster server.
+
+Futher Research
+
+- Server side rendering
+- Caching pages with Redis
+- Removing dependencies from app to reduce size

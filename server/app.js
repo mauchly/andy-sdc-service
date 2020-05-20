@@ -1,10 +1,10 @@
+// const newrelic = require('newrelic');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-// const Reviews = require('../database/mongo');
 const client = require('../database/postgres/index');
 var expressStaticGzip = require('express-static-gzip');
-const postgresDataSyntax = require('./helpers');
+const postgresDataSyntax = require('./helpers/helpers');
 
 let app = express();
 app.use(cors());
@@ -67,15 +67,12 @@ app.get('/averageScore/:id', (req, res) => {
 app.get('/listing', async (req, res) => {
   let listId = req.query.data || 10001;
 
-  let reg = /\d{5}/;
-  //test to see if id num or listing string
-  let result = reg.test(listId);
-
   const data = await client.query(
     `SELECT * FROM reviews where listing_id = ${listId};`
   );
 
   let reviews = postgresDataSyntax(data.rows);
+
   res.send(reviews);
 });
 
