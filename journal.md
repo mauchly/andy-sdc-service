@@ -344,15 +344,19 @@ if (cluster.isMaster) {
 #### Single server
 
 **1 Request**
+
 <img src="./photos/1_RPS_ST.png" width="300" >
 
 **10 Requests**
+
 <img src="./photos/10_RPS_ST.png" width="300">
 
 **100 Requests**
+
 <img src="./photos/100_RPS_ST.png" width="300">
 
 **1000 Requests**
+
 <img src="./photos/1K_RPS_ST.png" width="300">
 
 ##### New Relic Dashboard Single Server
@@ -362,15 +366,19 @@ if (cluster.isMaster) {
 #### Cluster
 
 **1 Request**
+
 <img src="./photos/1_RPS_MT.png" width="300">
 
 **10 Requests**
+
 <img src="./photos/10_RPS_MT.png" width="300">
 
 **100 Requests**
+
 <img src="./photos/100_RPS_MT.png" width="300">
 
 **1000 Requests**
+
 <img src="./photos/1K_RPS_MT.png" width="300">
 
 ##### New Relic Dashboard Cluster
