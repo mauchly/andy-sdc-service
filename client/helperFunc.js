@@ -16,11 +16,11 @@ const score = (value) => {
     helperScore += +scores.location;
     helperScore += +scores.value;
 
-    finalScore += (helperScore / 6);
+    finalScore += helperScore / 6;
     helperScore = 0;
   }
-  return (finalScore / reviews.length);
-}
+  return finalScore / reviews.length;
+};
 
 const totalReviews = (value) => {
   if (value.length === 0) {
@@ -28,22 +28,24 @@ const totalReviews = (value) => {
   } else {
     return value[0].reviews.length;
   }
-}
+};
 
 //ratings.jsx
 
 const border = (value, attr) => {
   return {
-    'borderBottom': 'solid',
-    'borderBottomWidth': '50%',
-    'position': 'relative',
-    'bottom': '10px',
-    'left': '45px',
-    'right': '105px',
-    'paddingLeft': (((+attrScore(value, attr) * 20) + 5).toFixed(0) + 'px').toString(),
-    'color': 'black',
-  }
-}
+    borderBottom: 'solid',
+    borderBottomWidth: '50%',
+    position: 'relative',
+    bottom: '10px',
+    left: '45px',
+    right: '105px',
+    paddingLeft: (
+      (+attrScore(value, attr) * 20 + 5).toFixed(0) + 'px'
+    ).toString(),
+    color: 'black',
+  };
+};
 
 const attrScore = (value, attr) => {
   if (value.length === 0) {
@@ -55,12 +57,12 @@ const attrScore = (value, attr) => {
     let scores = reviews[i].scores[0];
     helperScore += +scores[attr];
   }
-  return (helperScore / reviews.length);
-}
+  return helperScore / reviews.length;
+};
 
 module.exports = {
   score,
   totalReviews,
   border,
-  attrScore
-}
+  attrScore,
+};

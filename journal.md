@@ -102,7 +102,7 @@ Relevant Docs
 - Set up testdb as cluster as this will help with faster querying for large data sets.
 - Set up partition key with creating test documents. Set key as id.
 
-``` javascript
+```javascript
 {
   "_id": "{PARTITION KEY}:72e8bdde44adc8fc4a1b3fedba0086c5",
   "id": 1,
@@ -128,6 +128,7 @@ Relevant docs
   - `curl -X PUT http://{username:password}@localhost:5984/{documentName}`
   - to create document abreviews
 - used script
+
   - `cat {filePathForCSVFile} | couchimport --url http://{username:password}@localhost:5984 --db {documentName} --delimiter ‘,’ CSV HEADER`
   - to seed small data set.
 
@@ -143,7 +144,7 @@ Relevant docs
 
 Query:
 
-``` SQL
+```SQL
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE id = 24000000;
 ```
 
@@ -155,7 +156,7 @@ Ran same query again and speeds were significantly faster.
 - `Planning Time: 0.079 ms`
 - `Execution Time: 0.038 ms`
 
-**Issue: when querying reviews based on foreign key `listing_id` performnce is significantly slower**
+**Issue: when querying reviews based on foreign key `listing_id` performance is significantly slower**
 
 ```SQL
 EXPLAIN ANALYZE SELECT * FROM reviews WHERE listing_id = 9000000;
@@ -205,11 +206,11 @@ Ran SELECT query again and got:
 - `Execution Time: 0.042 ms`
 
 POST REQUEST
-***Two part***
+**_Two part_**
 
 - have to create a new listing
 - then can create new review
-***Due to foreign key constraint***
+  **_Due to foreign key constraint_**
 
 Create new listing
 
@@ -276,3 +277,123 @@ Cons
 - Low adoption from dev community.
 
 #### Recommendation: POSTGRES
+
+## Phase 2 Measure Initial Performance
+
+### Install New Relic
+
+- Set up account and save `key`
+- Had to rename server.js to app.js because new relic config was looking for app.js
+- Copied `newrelic.js` file from node modules and inserted `key` and `app-name`. Added `newrelic.js` to server folder in main directory.
+- Updated `.gitignore` to not add `newrelic.js` as it contained newrelic service `key`.
+- New relic dashboard benchmarking `app.js`.
+
+#### Install Artillery
+
+Relevant Docs: <https://artillery.io/docs/getting-started>
+
+- Looked at k6m, Jmeter and Artillery for stress testing.
+- Decided to go with Artillery.
+
+- `npm install -g artillery`
+- created a helpers folder in `server` folder and added file `test.yaml`
+- In `test.yaml` duration refers to time/sec that requests will be fired. Arrival rate refers to number of requests per second.
+- Settings:
+  - `duration = 240`
+  - `arrivalRate = 1 || 10 || 100 || 1000`
+
+#### Clustering Node js server
+
+Relevant Docs:
+<https://www.youtube.com/watch?v=w1IzRF6AkuI>
+<https://www.youtube.com/watch?v=6xIbVPyh9wo>
+
+Need to cluster app. Clustering allows cpu to use multiple cores. This allows for higher traffic processing.
+
+- Create `cluster.js` file in server folder.
+- Add in code
+
+```Javascript
+const newrelic = require('newrelic');
+const cluster = require('cluster');
+
+// If the process is the Master Process than fork off n-cores clusters available
+if (cluster.isMaster) {
+  // Count the machine's CPUs
+  var cpuCount = require('os').cpus().length;
+
+  // Create a worker for each CPU
+  for (var i = 0; i < cpuCount; i += 1) {
+    cluster.fork();
+  }
+
+  // Listen for dying workers
+  cluster.on('exit', function () {
+    cluster.fork();
+  });
+} else {
+  // If cluster is worker process then run instance of app.js
+  require('./app');
+}
+```
+
+- Run `node cluster.js` instead of `npm run server-dev` to start cluster server.
+
+#### Stress Test Server with 1, 10, 100, 1000 RPS
+
+#### Single server
+
+**1 Request**
+
+<img src="./photos/1_RPS_ST.png" width="300" >
+
+**10 Requests**
+
+<img src="./photos/10_RPS_ST.png" width="300">
+
+**100 Requests**
+
+<img src="./photos/100_RPS_ST.png" width="300">
+
+**1000 Requests**
+
+<img src="./photos/1K_RPS_ST.png" width="300">
+
+##### New Relic Dashboard Single Server
+
+<img src="./photos/NR_Dashboard_ST_test.png">
+
+#### Cluster
+
+**1 Request**
+
+<img src="./photos/1_RPS_MT.png" width="300">
+
+**10 Requests**
+
+<img src="./photos/10_RPS_MT.png" width="300">
+
+**100 Requests**
+
+<img src="./photos/100_RPS_MT.png" width="300">
+
+**1000 Requests**
+
+<img src="./photos/1K_RPS_MT.png" width="300">
+
+##### New Relic Dashboard Cluster
+
+<img src="./photos/NewRelicCluster.png">
+
+#### Notes
+
+Cluster vs Single Core
+
+- Seems that below 100-RPS performance is similar between using once instance of server vs clustering. However at 1k-RPS, single instance of server immediately crashes. Cluster server runs but still gets about 4k 500 errors out of 240k requests.
+- First request to postgres is still significantly slower than subsequent requests for both single server and cluster server.
+
+Futher Research
+
+- Server side rendering
+- Caching pages with Redis
+- Removing dependencies from app to reduce size

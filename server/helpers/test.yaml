@@ -1,0 +1,12 @@
+config:
+  target: 'http://localhost:3004'
+  phases:
+    - duration: 240
+      arrivalRate: 1000
+scenarios:
+  - name: 'test load'
+    flow:
+      - get:
+          url: '/9923453'
+# duration is the number of seconds
+# arrivalRate is the number of requests per second
