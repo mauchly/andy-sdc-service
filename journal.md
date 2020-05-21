@@ -343,19 +343,19 @@ if (cluster.isMaster) {
 
 #### Single server
 
-**1 Request**
+##### 1 Request
 
 <img src="./photos/1_RPS_ST.png" width="300" >
 
-**10 Requests**
+##### 10 Requests
 
 <img src="./photos/10_RPS_ST.png" width="300">
 
-**100 Requests**
+##### 100 Requests
 
 <img src="./photos/100_RPS_ST.png" width="300">
 
-**1000 Requests**
+##### 1000 Requests
 
 <img src="./photos/1K_RPS_ST.png" width="300">
 
@@ -365,19 +365,19 @@ if (cluster.isMaster) {
 
 #### Cluster
 
-**1 Request**
+##### 1 Request
 
 <img src="./photos/1_RPS_MT.png" width="300">
 
-**10 Requests**
+##### 10 Requests
 
 <img src="./photos/10_RPS_MT.png" width="300">
 
-**100 Requests**
+##### 100 Requests
 
 <img src="./photos/100_RPS_MT.png" width="300">
 
-**1000 Requests**
+##### 1000 Requests
 
 <img src="./photos/1K_RPS_MT.png" width="300">
 
@@ -392,7 +392,7 @@ Cluster vs Single Core
 - Seems that below 100-RPS performance is similar between using once instance of server vs clustering. However at 1k-RPS, single instance of server immediately crashes. Cluster server runs but still gets about 4k 500 errors out of 240k requests.
 - First request to postgres is still significantly slower than subsequent requests for both single server and cluster server.
 
-Futher Research
+Further Research
 
 - Server side rendering
 - Caching pages with Redis
