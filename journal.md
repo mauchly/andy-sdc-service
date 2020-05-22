@@ -379,17 +379,17 @@ if (cluster.isMaster) {
 
 ##### 1000 Requests
 
-<img src="./photos/1K_RPS_MT.png" width="300">
+<img src="./photos/1K_RPS_MT_v2a.png" width="300">
 
 ##### New Relic Dashboard Cluster
 
-<img src="./photos/NewRelicCluster.png">
+<img src="./photos/1k_RPS_MT_v2.png">
 
 #### Notes
 
 Cluster vs Single Core
 
-- Seems that below 100-RPS performance is similar between using once instance of server vs clustering. However at 1k-RPS, single instance of server immediately crashes. Cluster server runs but still gets about 4k 500 errors out of 240k requests.
+- Seems that below 100-RPS performance is similar between using once instance of server vs clustering. However at 1k-RPS, single instance of server immediately crashes. Cluster server runs but still gets about 3k 500 errors out of 240k requests.
 - First request to postgres is still significantly slower than subsequent requests for both single server and cluster server.
 
 Further Research
@@ -397,3 +397,54 @@ Further Research
 - Server side rendering
 - Caching pages with Redis
 - Removing dependencies from app to reduce size
+
+#### Server side rendering Research
+
+##### Server side vs Client side
+
+Server side
+
+Pros:
+
+- Search engines can crawl site resulting in better SEO
+- Initial page load is faster
+- Good for static sites
+
+Cons:
+
+- Frequent server requests
+- Overall slower page rendering
+- Ful page reloads
+- Not good for interactive sites
+
+Client side
+
+Pros:
+
+- Good for interactive sites
+- Fast rendering after initial load
+- Good for web applications
+- Lots of JS libraries
+
+Cons:
+
+- Bad for SEO
+- Initial load time is slower
+- Uses external libraries
+
+Research:
+
+Electrode JS.
+
+- A npm package to reduce React `RenderToString` time by 70%.
+
+Ran test where I just sent back a `h1` string for any call made to server.
+Then load tested 1k RPS. Results were similar to original structure.
+
+Conclusion:
+
+- Server side rendering or Redis caching is not going to solve the bottle neck.
+- Most likely a limitation with my local machine.
+- Moving forward to cloud migration.
+
+## Phase 3: Deploy the Service and Proxy
