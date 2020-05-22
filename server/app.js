@@ -1,4 +1,3 @@
-// const newrelic = require('newrelic');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -8,7 +7,6 @@ const postgresDataSyntax = require('./helpers/helpers');
 
 let app = express();
 app.use(cors());
-// app.use(express.static('public'));
 app.use(express.text());
 app.use(express.json());
 app.use(express.urlencoded());
