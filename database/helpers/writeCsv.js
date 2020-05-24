@@ -107,14 +107,5 @@ const createCSV = (dataGenFunc, stream, header) => {
 //==================================
 // PSQL Command
 //==================================
-// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{filePath.csv}' DELIMITER ',' CSV HEADER;
-
-//==================================
-// CouchDB Command
-//==================================
-// create couchDB document
-// curl -X PUT http://{username:password}@localhost:5984/{dbName}
-
-// Seed couchDB from CSV
-// cat {csvFilePath} | couchimport --url http://{username:password}@localhost:5984 --db abreviews
-// cat myOutputReviewsLargeCouch.csv | couchimport --url http://{username:password}@localhost:5984 --db abreviews --delimiter ','
+// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{reviewsFilePath.csv}' DELIMITER ',' CSV HEADER;
+// copy listings(id) from '{listingsFilePath.csv}' DELIMITER ',' CSV HEADER;

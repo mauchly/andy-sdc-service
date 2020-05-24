@@ -9,13 +9,14 @@
   },
   "scripts": {
     "build": "webpack --mode=production",
-    "react-dev": "webpack -d --watch --mode=development",
+    "react-dev": "webpack -d --watch --mode=production",
     "server-dev": "nodemon server/app.js",
     "seed": "node ./database/seed.js",
     "test": "jest"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-static-gzip": "^2.0.6",
     "faker": "^4.1.0",

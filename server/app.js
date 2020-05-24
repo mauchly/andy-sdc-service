@@ -1,19 +1,16 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+require('dotenv').config();
 const client = require('../database/postgres/index');
-var expressStaticGzip = require('express-static-gzip');
+const expressStaticGzip = require('express-static-gzip');
 const postgresDataSyntax = require('./helpers/helpers');
 
-let app = express();
+const app = express();
 app.use(cors());
 app.use(express.text());
 app.use(express.json());
-app.use(express.urlencoded());
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   '/',
