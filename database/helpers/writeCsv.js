@@ -7,7 +7,9 @@ const fs = require('fs');
 //To prevent memory leak when dealing with multiple events
 require('events').EventEmitter.defaultMaxListeners = 10;
 
-let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
+// let listingsStream = fs.createWriteStream(
+//   '../../data/myOutputListingsLarge.csv'
+// );
 let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
 
 //==================================
@@ -101,7 +103,7 @@ const createCSV = (dataGenFunc, stream, header) => {
   stream.end();
 };
 
-// createCSV(createReviews, reviewsStream, reviewsHeader);
+createCSV(createReviews, reviewsStream, reviewsHeader);
 // createCSV(listingQueryStr, listingsStream, listingHeader);
 
 //==================================

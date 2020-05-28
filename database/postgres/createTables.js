@@ -23,14 +23,14 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 client
   .query(listingsQuery)
-  .then(() => {
-    console.log('Listing is successfully created');
+  .then((res) => {
+    console.log(res, 'Listing is successfully created');
   })
   .then(() => {
     client.query(reviewsQuery);
   })
-  .then(() => {
-    console.log('Reviews is successfully created');
+  .then((res) => {
+    console.log(res, 'Reviews is successfully created');
     client.end();
   })
   .catch((err) => {
