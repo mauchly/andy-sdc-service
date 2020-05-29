@@ -631,7 +631,9 @@ Results:
 
 10 RPS
 
-<img src="./photos/10_RPS_1_EC2_Loader_Dash.png" width="300"> <img src="./photos/10_RPS_1_EC2_NewRelic_Dash.png" width="300">
+<img src="./photos/10_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/10_RPS_1_EC2_NewRelic_Dash.png" width="50%">
 
 At 10RPS we have a response time under `2ms` and 0% error rate
 
@@ -639,8 +641,9 @@ At 10RPS we have a response time under `2ms` and 0% error rate
 
 100 RPS
 
-<img src="./photos/100_RPS_1_EC2_Loader_Dash.png" width="300">
-<img src="./photos/100_RPS_1_EC2_NewRelic_Dash.png" width="300">
+<img src="./photos/100_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/100_RPS_1_EC2_NewRelic_Dash.png" width="50%">
 
 At 100RPS we have a response time under `3ms` and 0% error rate
 
@@ -648,15 +651,17 @@ At 100RPS we have a response time under `3ms` and 0% error rate
 
 1000 RPS
 
-<img src="./photos/1k_RPS_1_EC2_Loader_Dash.png" width="300">
+<img src="./photos/1k_RPS_1_EC2_Loader_Dash.png" width="50%">
 
 **Everything Breaks!**
 
 <hr>
 
-300 RPS
+50% RPS
 
-<img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="300"> <img src="./photos/300_RPS_1_EC2_NewRelic_Dash.png" width="300">
+<img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/300_RPS_1_EC2_NewRelic_Dash.png" width="50%">
 
 At 300RPS we have a response time under `4ms` and 0% error rate
 
