@@ -448,3 +448,165 @@ Conclusion:
 - Moving forward to cloud migration.
 
 ## Phase 3: Deploy the Service and Proxy
+
+### Preparing app for AWS
+
+Adding env variables
+
+- install dotenv npm package
+- create `.env` file and add variables for port, db info and new relic key
+
+### Postgres on EC2 instance
+
+1. Create new EC2 instance
+2. Install Postgres on EC2
+3. Migrate Data from `csv` into EC2 postgres instance
+
+#### Create new EC2 instance
+
+Relevant Docs:
+
+<https://www.shubhamdipt.com/blog/postgresql-on-ec2-ubuntu-in-aws/>
+
+- Use `Ubuntu` t2.micro and set storage to 20GB
+- Set security group as
+
+  1. Custom TCP: 5432, Source: Anywhere
+  2. SSH TCP:22, Source: Anywhere
+  3. Lauch Instance
+
+- SSH into EC2 instance
+  - In EC2 terminal
+
+#### Install and conncet to Postgres
+
+Relevant Docs:
+<https://www.shubhamdipt.com/blog/postgresql-on-ec2-ubuntu-in-aws/>
+
+<https://tableplus.com/blog/2018/10/how-to-start-stop-restart-postgresql-server.html>
+
+```bash
+sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get install postgresql postgresql-contrib​
+```
+
+Sudo into postgres and set password
+
+```text
+sudo -u postgres psql
+postgres=#\password​
+```
+
+after setting pw exit out of postgres by `\q`
+
+Now update configuration for remote access for clients.
+
+**Make sure that postgres version matches sudo command!**
+
+```bash
+# Edit pg_hba.conf in vim
+sudo vim /etc/postgresql/9.5/main/pg_hba.conf
+
+# Near bottom of file after local rules, add rule (allows remote access):
+host    all             all             0.0.0.0/0               md5
+
+# save file​
+```
+
+```bash
+# Edit config in vim
+# make sure psql version matches! Currently using 9.5
+sudo vim /etc/postgresql/9.5/main/postgresql.conf
+
+# Change line 59 to listen to external requests:
+listen_address='*'
+
+# save file​
+```
+
+Restart the PostgreSQL server
+
+```bash
+# Restart postgres server
+sudo /etc/init.d/postgresql restart​
+```
+
+Make sure in the `ubuntu` terminal you log in to postgres as the `superuser` and set a password
+
+e.g
+
+```bash
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+```
+
+Now you may connect to the EC2 postgresql using the public DNS provided and port 5432.
+
+Create database.
+
+```text
+$sudo su postgres
+$psql
+postgres=# CREATE DATABASE <database_name>;
+postgres=# CREATE USER <user> with encrypted password '<password>';
+postgres=# GRANT ALL PRIVILEGES ON DATABASE <database_name> TO <user>;​
+```
+
+**Can now connect local machine to EC2 postgres DB!**
+
+- In `.env` file on local machine change
+- import env into `database/postgres/index.js` with command:
+  - `require('dotenv').config({ path: '../../.env' });`
+- `host` to aws public DNS
+- `user`, `password`, `database` and `port` to match EC2.
+
+#### Migrate CSV Data into EC2 Postgres instance
+
+1. Migrate csv data from local machine into S3
+
+   - Create s3 Bucket in AWS
+   - Drag and drop csv files into s3.
+
+2. Transfer from S3 to Postgres EC2 master instance
+   Relevant Docs: <https://www.youtube.com/watch?v=qRT8DuPD0Ak>
+
+   - In aws ubuntu server, create a file `data` to store
+   - install `aws cli`
+   - In aws, create a IAM role.
+   - In EC2, attach IAM role.
+   - In aws umbuntu server, use command
+     - `aws s3 cp s3://{bucketName}/{csvFileName} {fileNameToBeSavedInUmbuntu}`
+
+3. Use `Copy` command csv data into Postgres EC2 master
+
+- log into postgres at `/home/data`
+- copy listings and reviews into postgres from csv files saved in `/home/data...` folder
+- create index for `listing_id`
+- Test connection to local machine
+
+Notes:
+
+- Looked into npm package `pg-copy-streams` as well as `scp` terminal commands.
+- Found it to be a bit complex to migrate data directly from local machine to EC2 because of authentication issues.
+- Instead chose to migrate data to s3 bucket and then transfer from s3 to EC2.
+- This process was very smooth.
+
+### App Service to EC2 instance
+
+Relevant docs:
+
+Deploying App on AWS
+
+- <https://itnext.io/deploy-a-mongodb-expressjs-reactjs-nodejs-mern-stack-web-application-on-aws-ec2-2a0d8199a682>
+
+- <https://www.youtube.com/watch?v=fIeIzHMC4BQ>
+
+Notes:
+
+- Have to install all global packages on to EC2.
+- Used process of elimination for errors to figure out what was missing.
+- Make sure to add `.env` file to EC2 as it's git ignored when cloning.
+- In `client/src/index.jsx` make sure to change ajax API address. There is no need to put port on URL. e.g. `http://ec2-54-193-53-224.us-west-1.compute.amazonaws.com:/listing`
+
+- Fairly smooth process
+
+### Stress test Service on AWS

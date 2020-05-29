@@ -7,7 +7,9 @@ const fs = require('fs');
 //To prevent memory leak when dealing with multiple events
 require('events').EventEmitter.defaultMaxListeners = 10;
 
-let listingsStream = fs.createWriteStream('../../data/myOutputListings.csv');
+// let listingsStream = fs.createWriteStream(
+//   '../../data/myOutputListingsLarge.csv'
+// );
 let reviewsStream = fs.createWriteStream('../../data/myOutputReviewsLarge.csv');
 
 //==================================
@@ -101,20 +103,11 @@ const createCSV = (dataGenFunc, stream, header) => {
   stream.end();
 };
 
-// createCSV(createReviews, reviewsStream, reviewsHeader);
+createCSV(createReviews, reviewsStream, reviewsHeader);
 // createCSV(listingQueryStr, listingsStream, listingHeader);
 
 //==================================
 // PSQL Command
 //==================================
-// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{filePath.csv}' DELIMITER ',' CSV HEADER;
-
-//==================================
-// CouchDB Command
-//==================================
-// create couchDB document
-// curl -X PUT http://{username:password}@localhost:5984/{dbName}
-
-// Seed couchDB from CSV
-// cat {csvFilePath} | couchimport --url http://{username:password}@localhost:5984 --db abreviews
-// cat myOutputReviewsLargeCouch.csv | couchimport --url http://{username:password}@localhost:5984 --db abreviews --delimiter ','
+// copy reviews(id, username, date, avatar, text, listing_id, communication, checkin, value, accuracy, location, cleanliness) from '{reviewsFilePath.csv}' DELIMITER ',' CSV HEADER;
+// copy listings(id) from '{listingsFilePath.csv}' DELIMITER ',' CSV HEADER;

@@ -7,16 +7,16 @@ module.exports = {
   entry: `${source_dir}/index.jsx`,
   output: {
     filename: `bundle.js`,
-    path: `${public_dir}`
+    path: `${public_dir}`,
   },
   plugins: [
     new BrotliPlugin({
-        asset: '[path].br[query]',
-        test: /\.(js|css|html|svg)$/,
-        threshold: 10240,
-        minRatio: 0.8
-      })
-    ],
+      asset: '[path].br[query]',
+      test: /\.(js|css|html|svg)$/,
+      threshold: 10240,
+      minRatio: 0.8,
+    }),
+  ],
   module: {
     rules: [
       {
@@ -25,10 +25,13 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-react", "@babel/preset-env"]
-          }
-        }
-      }
-    ]
-  }
+            presets: ['@babel/preset-react', '@babel/preset-env'],
+          },
+        },
+      },
+    ],
+  },
+  node: {
+    fs: 'empty',
+  },
 };

@@ -31,8 +31,7 @@ public/814f73c8d55c54cde04cf90cf4779251.png
 public/d952f3584101a206dc267a0f3ef61c24.png
 
 # Config
-database/database.config.js
-server/newrelic.js
+.env
 
 # Data
 data/

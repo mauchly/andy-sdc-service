@@ -1,12 +1,12 @@
-const { Client } = require('pg');
-const { dbPw } = require('../database.config');
+const { Pool } = require('pg');
+require('dotenv').config({ path: '../../.env' });
 
-const client = new Client({
-  user: 'admin',
-  host: 'localhost',
-  database: 'abreviews',
-  password: dbPw,
-  port: 5432,
+const client = new Pool({
+  user: process.env.USERDB,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
+  port: process.env.DBPORT,
 });
 
 client.connect(() => {

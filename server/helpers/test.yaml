@@ -1,7 +1,7 @@
 config:
   target: 'http://localhost:3004'
   phases:
-    - duration: 240
+    - duration: 10
       arrivalRate: 1000
 scenarios:
   - name: 'test load'

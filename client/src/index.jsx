@@ -4,10 +4,11 @@ import $ from 'jquery';
 import Score from './components/score.jsx';
 import Ratings from './components/ratings.jsx';
 import Reviews from './components/reviews.jsx';
-const port = 3004;
-// import pic1 from '!file-loader!../../img/AfterReviewsHardcodePhoto1.png';
-// import pic2 from '!file-loader!../../img/AfterReviewsHardcodePhoto2.png';
-// import pic3 from '!file-loader!../../img/AfterReviewsHardcodePhoto3.png';
+import Dotenv from 'dotenv';
+Dotenv.config();
+const port = process.env.PORT || 3004;
+const localApiUrl = `http://localhost:${port}/listing`;
+const awsAPIUrl = `http://ec2-54-193-53-224.us-west-1.compute.amazonaws.com:/listing`;
 
 const imgStyle = {
   width: '80%',
@@ -37,7 +38,7 @@ class App extends React.Component {
 
     $.ajax({
       type: 'GET',
-      url: `http://localhost:${port}/listing`,
+      url: awsAPIUrl,
       data: { data: listingId },
       dataType: 'text',
       success: (results) => {
