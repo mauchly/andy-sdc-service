@@ -8,7 +8,7 @@ import Dotenv from 'dotenv';
 Dotenv.config();
 const port = process.env.PORT || 3004;
 const localApiUrl = `http://localhost:${port}/listing`;
-const awsAPIUrl = `http://ec2-54-193-53-224.us-west-1.compute.amazonaws.com:/listing`;
+const awsAPIUrl = `http://ec2-54-193-53-224.us-west-1.compute.amazonaws.com/listing`;
 
 const imgStyle = {
   width: '80%',

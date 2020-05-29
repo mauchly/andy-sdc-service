@@ -610,3 +610,60 @@ Notes:
 - Fairly smooth process
 
 ### Stress test Service on AWS
+
+#### Set up loader.io
+
+Relevant Docs:
+
+- <https://loader.io/>
+- <https://support.loader.io/article/20-verifying-an-app>
+
+Notes:
+
+- Download API key.
+- **Put the {loaderio-APIKEY.txt} file in `Public` folder and NOT in the root folder**
+  - Loaderio is looking for auth file in public where the bundle.js file and index.html files reside.
+- Set up tests for 1, 10, 100, 1K with App and DB running on respective EC2 instances.
+
+#### Initial Stress Test with 1 EC2 Instance
+
+Results:
+
+10 RPS
+
+<img src="./photos/10_RPS_1_EC2_Loader_Dash.png" width="300"> <img src="./photos/10_RPS_1_EC2_NewRelic_Dash.png" width="300">
+
+At 10RPS we have a response time under `2ms` and 0% error rate
+
+<hr>
+
+100 RPS
+
+<img src="./photos/100_RPS_1_EC2_Loader_Dash.png" width="300">
+<img src="./photos/100_RPS_1_EC2_NewRelic_Dash.png" width="300">
+
+At 100RPS we have a response time under `3ms` and 0% error rate
+
+<hr>
+
+1000 RPS
+
+<img src="./photos/1k_RPS_1_EC2_Loader_Dash.png" width="300">
+
+**Everything Breaks!**
+
+<hr>
+
+300 RPS
+
+<img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="300"> <img src="./photos/300_RPS_1_EC2_NewRelic_Dash.png" width="300">
+
+At 300RPS we have a response time under `4ms` and 0% error rate
+
+<hr>
+
+Result Analysis:
+
+Seems that 300RPS is the sweet spot for running app on 1 EC2 instance. I stress tested with 500 and 700. Got around a 10 - 30% error rate respectively.
+
+Moving forward, I'm going to cap each EC2 at 200RPS to play it safe. Going to also look into Vertical scaling the EC2 instance. But have to take in to account AWS costs....
