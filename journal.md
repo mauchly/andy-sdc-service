@@ -591,3 +591,22 @@ Notes:
 - This process was very smooth.
 
 ### App Service to EC2 instance
+
+Relevant docs:
+
+Deploying App on AWS
+
+- <https://itnext.io/deploy-a-mongodb-expressjs-reactjs-nodejs-mern-stack-web-application-on-aws-ec2-2a0d8199a682>
+
+- <https://www.youtube.com/watch?v=fIeIzHMC4BQ>
+
+Notes:
+
+- Have to install all global packages on to EC2.
+- Used process of elimination for errors to figure out what was missing.
+- Make sure to add `.env` file to EC2 as it's git ignored when cloning.
+- In `client/src/index.jsx` make sure to change ajax API address. There is no need to put port on URL. e.g. `http://ec2-54-193-53-224.us-west-1.compute.amazonaws.com:/listing`
+
+- Fairly smooth process
+
+### Stress test Service on AWS
