@@ -657,7 +657,7 @@ At 100RPS we have a response time under `3ms` and 0% error rate
 
 <hr>
 
-50% RPS
+500 RPS
 
 <img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="50%">
 
@@ -672,3 +672,45 @@ Result Analysis:
 Seems that 300RPS is the sweet spot for running app on 1 EC2 instance. I stress tested with 500 and 700. Got around a 10 - 30% error rate respectively.
 
 Moving forward, I'm going to cap each EC2 at 200RPS to play it safe. Going to also look into Vertical scaling the EC2 instance. But have to take in to account AWS costs....
+
+Notes:
+Moving forward decided to containerize the app, create and containerize a load balancer and then re-deploy to EC2.
+
+### Docker
+
+Relevant Docs:
+<https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/>
+
+Create `Dockerfile` in root directory of app
+
+```GO
+# Base Image. Alpine is a compressed version of Node
+FROM node:alpine
+
+# Where the app will be placed inside docker image
+WORKDIR '/usr/app'
+
+# Path to folder xx Path to copy inside of container
+COPY ./ ./
+
+# Install dependicies
+RUN npm install
+
+# Default command
+CMD ["npm", "start"]
+```
+
+In terminal:
+
+From root directory
+`docker build .`
+
+`docker run <container_id>`
+
+Notes:
+
+Had to create `npm start` script that included a webpack build and a server start script. App can now start with one command.
+
+Had to install nodemon as a dev dependency as it was installed globally on my local machine.
+
+Had to install `@babel/compat-data` as I was getting a error when trying to run app in docker container.
