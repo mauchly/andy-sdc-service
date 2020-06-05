@@ -693,7 +693,7 @@ WORKDIR '/usr/app'
 # Path to folder xx Path to copy inside of container
 COPY ./ ./
 
-# Install dependicies
+# Install dependencies
 RUN npm install
 
 # Default command
