@@ -705,7 +705,13 @@ In terminal:
 From root directory
 `docker build .`
 
-`docker run <container_id>`
+`docker run -p <new_port>:<port_in_app> <container_id>`
+
+can set container name so you don't have to use `container_id`
+`docker build -t <docker_username>/<name_of_app> .`
+
+now can just run
+`docker run -p <new_port>:<port_in_app> <image_name>`
 
 Notes:
 
@@ -714,3 +720,51 @@ Had to create `npm start` script that included a webpack build and a server star
 Had to install nodemon as a dev dependency as it was installed globally on my local machine.
 
 Had to install `@babel/compat-data` as I was getting a error when trying to run app in docker container.
+
+Had to delete eslint hack reactor package in package.json as well as set `extend: 'hackreactor'` in `.eslintrc`
+
+**Realized that docker is not vital, decided to table it for now**
+**Moving forward with creating a reverse proxy with Nginx**
+
+### Nginx Reverse Proxy
+
+#### Set up nginx and connect to single EC2 service instance
+
+Relevant docs:
+<https://www.youtube.com/watch?v=WmdL8aOVooM>
+<https://linuxize.com/post/start-stop-restart-nginx/>
+<https://www.youtube.com/watch?v=28ioY4vgC9I>
+
+- Launch EC2 instance
+  - Used linux ami
+  - Set security group to `SSH` and `HTTP` at `anywhere`
+  - SSH into EC2 instance
+
+```BASH
+  # Get into bash terminal
+  sudo bash
+
+  # Install nginx
+  amazon-linux-extras install -y nginx1.12
+
+  # Start nginx
+  sudo systemct1 restart nginx
+
+  # Set reverse proxy url
+  # Vim into nginx.conf
+  vi /etc/nginx/nginx.conf
+
+  # Scroll down to "location"
+  location / {
+          proxy_pass http://{ec2_service_ip}:{nginx_proxy_port};
+                e.g  http://127.0.0.0:80;
+  }
+
+  # Save and exit
+  # Reload
+  nginx -s reload
+```
+
+Proxy now working!
+
+#### Set up load balancing with multiple EC2 service instances
