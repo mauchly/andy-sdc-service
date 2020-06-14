@@ -126,10 +126,8 @@ app.put('/listing/:id', async (req, res) => {
   res.send(response);
 });
 
-// //delete listing
+//delete listing
 app.delete('/listing/:id', async (req, res) => {
-  console.log(req.params.id);
-
   const response = await client.query(
     `DELETE from reviews where listing_id = ${parseInt(req.params.id)}`
   );

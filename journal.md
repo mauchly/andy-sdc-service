@@ -748,7 +748,7 @@ Relevant docs:
   amazon-linux-extras install -y nginx1.12
 
   # Start nginx
-  sudo systemct1 restart nginx
+  sudo systemctl restart nginx
 
   # Set reverse proxy url
   # Vim into nginx.conf
@@ -768,3 +768,5 @@ Relevant docs:
 Proxy now working!
 
 #### Set up load balancing with multiple EC2 service instances
+
+Notes: Getting permission error when webpack is trying to build in new instance. Need to find a way to allow webpack to build bundle.js file.
