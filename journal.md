@@ -617,6 +617,7 @@ Relevant Docs:
 
 - <https://loader.io/>
 - <https://support.loader.io/article/20-verifying-an-app>
+- <https://support.loader.io/article/21-expression-syntax>
 
 Notes:
 
@@ -624,6 +625,7 @@ Notes:
 - **Put the {loaderio-APIKEY.txt} file in `Public` folder and NOT in the root folder**
   - Loaderio is looking for auth file in public where the bundle.js file and index.html files reside.
 - Set up tests for 1, 10, 100, 1K with App and DB running on respective EC2 instances.
+- When setting up tests, input `path` as `%{*:9000000-9100000}` this creates a varialbe that randomly picks a number between 9000000-9100000
 
 #### Initial Stress Test with 1 EC2 Instance
 
@@ -765,8 +767,109 @@ Relevant docs:
   nginx -s reload
 ```
 
+Might have to use terminal commands if `nginx -s reload` gives error?
+
+<https://serverfault.com/questions/565339/nginx-fails-to-stop-and-nginx-pid-is-missing>
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start nginx
+```
+
 Proxy now working!
 
 #### Set up load balancing with multiple EC2 service instances
 
-Notes: Getting permission error when webpack is trying to build in new instance. Need to find a way to allow webpack to build bundle.js file.
+Create new EC2 instance and pull from git for latest app version.
+
+Set up app to run on EC2.
+
+After app setup in EC2, sign in as root user with command
+`sudo su root`
+
+You should now have your app running on EC2.
+
+SSH into nginx EC2 and go to conf file to set up RoundRobin.
+
+Relevant doc
+<https://www.nginx.com/resources/wiki/start/topics/examples/loadbalanceexample/>
+
+```C
+http {
+  upstream roundrobin {
+
+    server {EC2PubicIP}:{nginxPort};
+    // e.g. server 12.140.2.300:8001;
+    server {EC2PubicIP2}:{nginxPort};
+    // e.g. server 12.149.60.500:8001;
+  }
+
+  server {
+    location / {
+      proxy_pass http://myproject;
+    }
+  }
+}
+```
+
+##### Set up shell script to automate EC2 set up on creation
+
+Relevant Docs
+<https://www.shellscript.sh/>
+
+Script
+
+```bash
+#! /bin/bash
+sudo apt-get update
+sudo apt-get install -y build-essential openssl libssl-dev pkg-config
+sudo apt-get install -y nodejs
+sudo apt-get install npm -y
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+sudo apt-get install git -y
+sudo mkdir /var/www
+cd /var/www
+sudo git clone -b scale https://github.com/mauchly/andy-sdc-service.git
+sudo npm install pm2 -g
+cd /var/www/
+sudo chown -R ubuntu andy-sdc-service
+cd andy-sdc-service
+sudo npm install
+echo "PORT=80" > .env
+echo "NEWRELICKEY="{NEWRELIC_KEY}" >> .env
+echo "USERDB={DB_USERNAME}" >> .env
+echo "HOST={DB_EC2_address}" >> .env
+echo "DATABASE={DBNAME}" >> .env
+echo "PASSWORD={DBPASSOWRD}" >> .env
+echo "DBPORT={DBPORT}" >> .env
+echo "{Loader.io_KEY}" >> {Loader.io.txt_FILE}
+cd /var/www/andy-sdc-service
+sudo su root
+killall -9 node
+pm2 start npm -- start
+```
+
+Add this script `Configure Instance Detains >> Advanced Details >> User Data >> text` upon EC2 launch.
+
+### Stress Test with multiple instances
+
+#### Architecture
+
+<img src="./photos/AppArch.jpg"/>
+
+- Currently optimal performance is at 4 instances connected to one DB, load balanced with Nginx round robin on EC2.
+
+- If I add more instances to Load balancer performance actually decreases!
+
+Loader.io results
+
+<img src="./photos/2k_RPS_Test_Setup.png" />
+
+<img src="./photos/2KRPS_Optimal.png" />
+
+Next Steps:
+
+- Add caching with Redis or Nginx (Research pros and cons)
+- Implement Server Side Rendering and cache with Redis
