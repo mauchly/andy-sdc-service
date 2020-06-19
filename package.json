@@ -30,6 +30,7 @@
     "pg-hstore": "^2.3.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "redis": "^3.0.2",
     "regenerator-runtime": "^0.13.5"
   },
   "devDependencies": {

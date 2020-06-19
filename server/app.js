@@ -2,9 +2,17 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
-const client = require('../database/postgres/index');
+
+//Database and redis
+const db = require('../database/postgres/index');
+const redis = require('redis');
+
+//Compressors
 const expressStaticGzip = require('express-static-gzip');
 const postgresDataSyntax = require('./helpers/helpers');
+
+//Controllers
+const { getAvgScore, getListing } = require('./controllers/index');
 
 const app = express();
 app.use(cors());
@@ -17,70 +25,45 @@ app.use(
   expressStaticGzip(path.join(__dirname + '/../public'), { enableBrotli: true })
 );
 
-//For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
-app.get('/averageScore/:id', (req, res) => {
-  let listId = req.params.id;
+const client = redis.createClient();
 
-  client.query(
-    `SELECT * FROM reviews where listing_id = ${listId};`,
-    (err, result) => {
-      result = postgresDataSyntax(result.rows);
-
-      if (err) {
-        console.log('error in averageScore', err);
-        res.sendStatus(404);
-      } else {
-        if (result.length === 0) {
-          return 0;
-        }
-        let finalScore = 0;
-        let helperScore = 0;
-        let reviews = result[0].reviews;
-        let reviewNumber = reviews.length;
-        for (let i = 0; i < reviews.length; i++) {
-          let scores = reviews[i].scores[0];
-          helperScore += +scores.cleanliness;
-          helperScore += +scores.communication;
-          helperScore += +scores.checkin;
-          helperScore += +scores.accuracy;
-          helperScore += +scores.location;
-          helperScore += +scores.value;
-          finalScore += helperScore / 6;
-          helperScore = 0;
-        }
-        res.end(
-          `${(finalScore / reviews.length)
-            .toFixed(2)
-            .toString()}, (${reviewNumber} reviews)`
-        );
-      }
-    }
-  );
+client.on('connect', function () {
+  console.log('connected to redis');
 });
+
+const cacheGetListingMiddleWare = (req, res, next) => {
+  let listId = req._parsedOriginalUrl.query.split('=')[1];
+
+  client.get(listId, (err, data) => {
+    if (err) throw err;
+
+    if (data !== null) {
+      res.send(JSON.parse(data));
+    } else {
+      next();
+    }
+  });
+};
+
+//For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
+// app.get('/averageScore/:id', getAvgScore);
 
 //Get listing by id
-app.get('/listing', async (req, res) => {
-  let listId = req.query.data || 10001;
+app.get('/listing', cacheGetListingMiddleWare, getListing);
 
-  const data = await client.query(
-    `SELECT * FROM reviews where listing_id = ${listId};`
-  );
-
-  let reviews = postgresDataSyntax(data.rows);
-
-  res.send(reviews);
-});
+//====================================
+//Post, Put, Delete
+//====================================
 
 //Post listing
 app.post('/listing', async (req, res) => {
   // Create new {id} for new review
-  let maxId = await (await client.query('SELECT max(id) FROM reviews')).rows[0]
-    .max;
+  let maxId = await (await db.query('SELECT max(id) FROM reviews')).rows[0].max;
   const newId = ++maxId;
 
   // Create new {listing_id} for new review
   let maxListingId = await (
-    await client.query('SELECT max(listing_id) FROM reviews')
+    await db.query('SELECT max(listing_id) FROM reviews')
   ).rows[0].max;
   const newListingId = ++maxListingId;
 
@@ -90,11 +73,11 @@ app.post('/listing', async (req, res) => {
     .map((entry, i) => (i < 4 ? `'${entry}'` : entry))
     .join(', ')}`;
 
-  const queryResListing = await client.query(
+  const queryResListing = await db.query(
     `INSERT INTO listings(id) VALUES(${newListingId})`
   );
 
-  const queryResReview = await client.query(
+  const queryResReview = await db.query(
     `INSERT INTO reviews(${columns}) VALUES(${values});`
   );
 
@@ -121,14 +104,14 @@ app.put('/listing/:id', async (req, res) => {
 
   const sqlString = `UPDATE reviews SET ${sqlSetString} WHERE id = ${reviewId};`;
 
-  const response = await client.query(sqlString);
+  const response = await db.query(sqlString);
 
   res.send(response);
 });
 
 //delete listing
 app.delete('/listing/:id', async (req, res) => {
-  const response = await client.query(
+  const response = await db.query(
     `DELETE from reviews where listing_id = ${parseInt(req.params.id)}`
   );
 
