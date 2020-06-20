@@ -5,11 +5,10 @@ require('dotenv').config();
 
 //Database and redis
 const db = require('../database/postgres/index');
-const redis = require('redis');
+const { cacheGetListingMiddleWare } = require('../database/redis');
 
 //Compressors
 const expressStaticGzip = require('express-static-gzip');
-const postgresDataSyntax = require('./helpers/helpers');
 
 //Controllers
 const { getAvgScore, getListing } = require('./controllers/index');
@@ -25,28 +24,8 @@ app.use(
   expressStaticGzip(path.join(__dirname + '/../public'), { enableBrotli: true })
 );
 
-const client = redis.createClient();
-
-client.on('connect', function () {
-  console.log('connected to redis');
-});
-
-const cacheGetListingMiddleWare = (req, res, next) => {
-  let listId = req._parsedOriginalUrl.query.split('=')[1];
-
-  client.get(listId, (err, data) => {
-    if (err) throw err;
-
-    if (data !== null) {
-      res.send(JSON.parse(data));
-    } else {
-      next();
-    }
-  });
-};
-
 //For other services, Get avg score & # of reviews e.g. '2.78, 12 reviews'
-// app.get('/averageScore/:id', getAvgScore);
+app.get('/averageScore/:id', getAvgScore);
 
 //Get listing by id
 app.get('/listing', cacheGetListingMiddleWare, getListing);

@@ -1,12 +1,7 @@
 const db = require('../../database/postgres/index');
 const postgresDataSyntax = require('../helpers/helpers');
 
-const redis = require('redis');
-const client = redis.createClient();
-
-client.on('connect', function () {
-  console.log('connected to redis');
-});
+const { client } = require('../../database/redis');
 
 const setAvgResponse = (finalScore, reviews, reviewNumber) => {
   return `${(finalScore / reviews.length)
@@ -61,7 +56,7 @@ const getListing = async (req, res, next) => {
 
   let reviews = postgresDataSyntax(data.rows);
 
-  client.setex(listId, 3600, JSON.stringify(reviews));
+  client.set(listId, JSON.stringify(reviews));
 
   res.send(reviews);
 };

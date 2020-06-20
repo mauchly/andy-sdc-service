@@ -873,3 +873,13 @@ Next Steps:
 
 - Add caching with Redis or Nginx (Research pros and cons)
 - Implement Server Side Rendering and cache with Redis
+
+###### Implementing Redis on App
+
+Relevant docs:
+<https://www.youtube.com/watch?v=oaJq1mQ3dFI>
+<https://www.sitepoint.com/using-redis-node-js/>
+
+- Refactor app by adding controllers folder;
+- Redis only caches strings so objects from database must be stringified
+- Parse redis data return strings to objects
