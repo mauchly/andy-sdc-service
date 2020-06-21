@@ -883,3 +883,91 @@ Relevant docs:
 - Refactor app by adding controllers folder;
 - Redis only caches strings so objects from database must be stringified
 - Parse redis data return strings to objects
+
+##### Installing Redis on EC2
+
+```bash
+sudo apt update
+sudo apt install redis-server
+
+sudo systemctl restart redis.service
+
+# test if running
+sudo systemctl status redis
+
+# test redis-cli
+redis-cli
+# should be in redis local command line
+ping
+# should return PONG
+# exit out of redis command line
+
+sudo systemctl restart redis
+
+# bind to local host
+sudo vi /etc/redis/redis.conf
+
+# find this line 'bind 127.0.0.1' and change to 'bind 127.0.0.1 ::1'
+sudo systemctl restart redis
+
+# check connection
+sudo netstat -lnp | grep redis
+
+# connect elistcache to local redis server
+redis-cli -h #{awsElisticacheHostAddress}
+
+# test connection
+
+```
+
+cd into `redis` folder and open `index.js`
+
+change to this
+
+```javascript
+var client = require('redis').createClient(
+  6379,
+  'elastichache endpoint string',
+  {
+    no_ready_check: true,
+  }
+);
+```
+
+Start app!
+
+#### Stress testing with Redis
+
+##### No Redis
+
+<img src="./photos/1k-RPC-2-Servers-W:O-Cache.png">
+
+##### With Redis
+
+<img src="./photos/1K-RPS-2-Server-With-Cache.png">
+
+Redis added significant improvement in performance.
+
+##### Ramp up to 4 servers and also removal of `New Relic`
+
+<img src="./photos/3K-RPS-4-Servers-With-Cache-No-NewRelic.png">
+
+Best performance currently obtainable.
+
+When I add more servers performance decreases!
+
+8 Servers with Redis Cache
+
+<img src="./photos/3K-RPS-8-Server-With-Cache-No-NewRelic.png">
+<img src="./photos/Nginx-8-Servers.png">
+
+8 Server Architicture
+
+<img src="./photos/AppArchScale.jpg">
+
+Notes
+
+Going to try and add a new instance of Redis to each 4 App servers.
+
+Getting optimal performance at 4 app servers.
+Bottleneck may be Redis when attached to more than 4 servers?
