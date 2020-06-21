@@ -1,6 +1,7 @@
 const redis = require('redis');
+require('dotenv').config({ path: '../../.env' });
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDISPORT, process.env.REDISURL);
 
 client.on('connect', function () {
   console.log('connected to redis');
