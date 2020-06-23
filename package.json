@@ -12,7 +12,7 @@
     "react-dev": "webpack -d --watch --mode=development",
     "react-prod": "webpack -d --watch --mode=production",
     "server-dev": "nodemon server/app.js",
-    "server-prod": "node server/app.js",
+    "server-prod": "node server/cluster.js",
     "seed": "node ./database/seed.js",
     "test": "jest",
     "start": "npm run build & npm run server-prod"
