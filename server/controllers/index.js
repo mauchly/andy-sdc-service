@@ -50,19 +50,15 @@ const getAvgScore = (req, res, next) => {
 const getListing = async (req, res, next) => {
   let listId = req.query.data || 10001;
 
-  try {
-    const data = await db.query(
-      `SELECT * FROM reviews where listing_id = ${listId};`
-    );
+  const data = await db
+    .query(`SELECT * FROM reviews where listing_id = ${listId};`)
+    .catch((e) => res.status(400).send(e));
 
-    let reviews = postgresDataSyntax(data.rows);
+  let reviews = postgresDataSyntax(data.rows);
 
-    client.set(listId, JSON.stringify(reviews));
+  client.set(listId, JSON.stringify(reviews));
 
-    res.send(reviews);
-  } catch (err) {
-    res.status(404).send(error);
-  }
+  res.send(reviews);
 };
 
 module.exports = { getAvgScore, getListing };
