@@ -1018,6 +1018,6 @@ http {
 }
 ```
 
-10k-RPS with two servers!!!
+10k-RPS with two servers!!
 
 <img src="./photos/10K-RPS-Cache-NewRelic.png">
