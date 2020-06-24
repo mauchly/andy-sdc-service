@@ -659,7 +659,7 @@ At 100RPS we have a response time under `3ms` and 0% error rate
 
 <hr>
 
-500 RPS
+300 RPS
 
 <img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="50%">
 
@@ -971,3 +971,53 @@ Going to try and add a new instance of Redis to each 4 App servers.
 
 Getting optimal performance at 4 app servers.
 Bottleneck may be Redis when attached to more than 4 servers?
+
+Tried scaling up to 17 servers but still same results.
+<img src="./photos/2.4-RPS-17-Servers.png">
+
+#### Nginx caching
+
+Relevant Docs:
+<https://www.ryadel.com/en/nginx-reverse-proxy-cache-centos-7-linux/>
+
+In `nginx.conf` file
+To access type `vi /etc/nginx/nginx.conf` in terminal
+
+```bash
+
+http {
+
+   upstream roundrobin {
+        server {serverIP}:{port};
+        # e.g. server 127.0.0.1:80
+   }
+
+  proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=9000g inactive=1d;
+
+  proxy_temp_path /var/cache/nginx/tmp;
+  proxy_cache_lock on;
+  proxy_cache_use_stale updating;
+  proxy_cache_valid 200 302 10m;
+  proxy_cache_valid 301 1h;
+  proxy_cache_valid any 1m;
+
+  server {
+    listen       80 default_server;
+    listen       [::]:80 default_server;
+    server_name  _;
+
+    location / {
+       proxy_cache my_cache;
+       proxy_http_version 1.1;
+       proxy_set_header Connection "";
+       add_header X-Cache-Status $upstream_cache_status;
+       add_header X-Handled-By $proxy_host;
+       proxy_pass http://roundrobin;
+    }
+  }
+}
+```
+
+10k-RPS with two servers!!!
+
+<img src="./photos/10K-RPS-Cache-NewRelic.png">
