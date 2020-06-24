@@ -610,3 +610,414 @@ Notes:
 - Fairly smooth process
 
 ### Stress test Service on AWS
+
+#### Set up loader.io
+
+Relevant Docs:
+
+- <https://loader.io/>
+- <https://support.loader.io/article/20-verifying-an-app>
+- <https://support.loader.io/article/21-expression-syntax>
+
+Notes:
+
+- Download API key.
+- **Put the {loaderio-APIKEY.txt} file in `Public` folder and NOT in the root folder**
+  - Loaderio is looking for auth file in public where the bundle.js file and index.html files reside.
+- Set up tests for 1, 10, 100, 1K with App and DB running on respective EC2 instances.
+- When setting up tests, input `path` as `%{*:9000000-9100000}` this creates a varialbe that randomly picks a number between 9000000-9100000
+
+#### Initial Stress Test with 1 EC2 Instance
+
+Results:
+
+10 RPS
+
+<img src="./photos/10_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/10_RPS_1_EC2_NewRelic_Dash.png" width="50%">
+
+At 10RPS we have a response time under `2ms` and 0% error rate
+
+<hr>
+
+100 RPS
+
+<img src="./photos/100_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/100_RPS_1_EC2_NewRelic_Dash.png" width="50%">
+
+At 100RPS we have a response time under `3ms` and 0% error rate
+
+<hr>
+
+1000 RPS
+
+<img src="./photos/1k_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+**Everything Breaks!**
+
+<hr>
+
+300 RPS
+
+<img src="./photos/300_RPS_1_EC2_Loader_Dash.png" width="50%">
+
+<img src="./photos/300_RPS_1_EC2_NewRelic_Dash.png" width="50%">
+
+At 300RPS we have a response time under `4ms` and 0% error rate
+
+<hr>
+
+Result Analysis:
+
+Seems that 300RPS is the sweet spot for running app on 1 EC2 instance. I stress tested with 500 and 700. Got around a 10 - 30% error rate respectively.
+
+Moving forward, I'm going to cap each EC2 at 200RPS to play it safe. Going to also look into Vertical scaling the EC2 instance. But have to take in to account AWS costs....
+
+Notes:
+Moving forward decided to containerize the app, create and containerize a load balancer and then re-deploy to EC2.
+
+### Docker
+
+Relevant Docs:
+<https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/>
+
+Create `Dockerfile` in root directory of app
+
+```GO
+# Base Image. Alpine is a compressed version of Node
+FROM node:alpine
+
+# Where the app will be placed inside docker image
+WORKDIR '/usr/app'
+
+# Path to folder xx Path to copy inside of container
+COPY ./ ./
+
+# Install dependencies
+RUN npm install
+
+# Default command
+CMD ["npm", "start"]
+```
+
+In terminal:
+
+From root directory
+`docker build .`
+
+`docker run -p <new_port>:<port_in_app> <container_id>`
+
+can set container name so you don't have to use `container_id`
+`docker build -t <docker_username>/<name_of_app> .`
+
+now can just run
+`docker run -p <new_port>:<port_in_app> <image_name>`
+
+Notes:
+
+Had to create `npm start` script that included a webpack build and a server start script. App can now start with one command.
+
+Had to install nodemon as a dev dependency as it was installed globally on my local machine.
+
+Had to install `@babel/compat-data` as I was getting a error when trying to run app in docker container.
+
+Had to delete eslint hack reactor package in package.json as well as set `extend: 'hackreactor'` in `.eslintrc`
+
+**Realized that docker is not vital, decided to table it for now**
+**Moving forward with creating a reverse proxy with Nginx**
+
+### Nginx Reverse Proxy
+
+#### Set up nginx and connect to single EC2 service instance
+
+Relevant docs:
+<https://www.youtube.com/watch?v=WmdL8aOVooM>
+<https://linuxize.com/post/start-stop-restart-nginx/>
+<https://www.youtube.com/watch?v=28ioY4vgC9I>
+
+- Launch EC2 instance
+  - Used linux ami
+  - Set security group to `SSH` and `HTTP` at `anywhere`
+  - SSH into EC2 instance
+
+```BASH
+  # Get into bash terminal
+  sudo bash
+
+  # Install nginx
+  amazon-linux-extras install -y nginx1.12
+
+  # Start nginx
+  sudo systemctl restart nginx
+
+  # Set reverse proxy url
+  # Vim into nginx.conf
+  vi /etc/nginx/nginx.conf
+
+  # Scroll down to "location"
+  location / {
+          proxy_pass http://{ec2_service_ip}:{nginx_proxy_port};
+                e.g  http://127.0.0.0:80;
+  }
+
+  # Save and exit
+  # Reload
+  nginx -s reload
+```
+
+Might have to use terminal commands if `nginx -s reload` gives error?
+
+<https://serverfault.com/questions/565339/nginx-fails-to-stop-and-nginx-pid-is-missing>
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start nginx
+```
+
+Proxy now working!
+
+#### Set up load balancing with multiple EC2 service instances
+
+Create new EC2 instance and pull from git for latest app version.
+
+Set up app to run on EC2.
+
+After app setup in EC2, sign in as root user with command
+`sudo su root`
+
+You should now have your app running on EC2.
+
+SSH into nginx EC2 and go to conf file to set up RoundRobin.
+
+Relevant doc
+<https://www.nginx.com/resources/wiki/start/topics/examples/loadbalanceexample/>
+
+```C
+http {
+  upstream roundrobin {
+
+    server {EC2PubicIP}:{nginxPort};
+    // e.g. server 12.140.2.300:8001;
+    server {EC2PubicIP2}:{nginxPort};
+    // e.g. server 12.149.60.500:8001;
+  }
+
+  server {
+    location / {
+      proxy_pass http://myproject;
+    }
+  }
+}
+```
+
+##### Set up shell script to automate EC2 set up on creation
+
+Relevant Docs
+<https://www.shellscript.sh/>
+
+Script
+
+```bash
+#! /bin/bash
+sudo apt-get update
+sudo apt-get install -y build-essential openssl libssl-dev pkg-config
+sudo apt-get install -y nodejs
+sudo apt-get install npm -y
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+sudo apt-get install git -y
+sudo mkdir /var/www
+cd /var/www
+sudo git clone -b scale https://github.com/mauchly/andy-sdc-service.git
+sudo npm install pm2 -g
+cd /var/www/
+sudo chown -R ubuntu andy-sdc-service
+cd andy-sdc-service
+sudo npm install
+echo "PORT=80" > .env
+echo "NEWRELICKEY="{NEWRELIC_KEY}" >> .env
+echo "USERDB={DB_USERNAME}" >> .env
+echo "HOST={DB_EC2_address}" >> .env
+echo "DATABASE={DBNAME}" >> .env
+echo "PASSWORD={DBPASSOWRD}" >> .env
+echo "DBPORT={DBPORT}" >> .env
+echo "{Loader.io_KEY}" >> {Loader.io.txt_FILE}
+cd /var/www/andy-sdc-service
+sudo su root
+killall -9 node
+pm2 start npm -- start
+```
+
+Add this script `Configure Instance Detains >> Advanced Details >> User Data >> text` upon EC2 launch.
+
+### Stress Test with multiple instances
+
+#### Architecture
+
+<img src="./photos/AppArch.jpg"/>
+
+- Currently optimal performance is at 4 instances connected to one DB, load balanced with Nginx round robin on EC2.
+
+- If I add more instances to Load balancer performance actually decreases!
+
+Loader.io results
+
+<img src="./photos/2k_RPS_Test_Setup.png" />
+
+<img src="./photos/2KRPS_Optimal.png" />
+
+Next Steps:
+
+- Add caching with Redis or Nginx (Research pros and cons)
+- Implement Server Side Rendering and cache with Redis
+
+###### Implementing Redis on App
+
+Relevant docs:
+<https://www.youtube.com/watch?v=oaJq1mQ3dFI>
+<https://www.sitepoint.com/using-redis-node-js/>
+
+- Refactor app by adding controllers folder;
+- Redis only caches strings so objects from database must be stringified
+- Parse redis data return strings to objects
+
+##### Installing Redis on EC2
+
+```bash
+sudo apt update
+sudo apt install redis-server
+
+sudo systemctl restart redis.service
+
+# test if running
+sudo systemctl status redis
+
+# test redis-cli
+redis-cli
+# should be in redis local command line
+ping
+# should return PONG
+# exit out of redis command line
+
+sudo systemctl restart redis
+
+# bind to local host
+sudo vi /etc/redis/redis.conf
+
+# find this line 'bind 127.0.0.1' and change to 'bind 127.0.0.1 ::1'
+sudo systemctl restart redis
+
+# check connection
+sudo netstat -lnp | grep redis
+
+# connect elistcache to local redis server
+redis-cli -h #{awsElisticacheHostAddress}
+
+# test connection
+
+```
+
+cd into `redis` folder and open `index.js`
+
+change to this
+
+```javascript
+var client = require('redis').createClient(
+  6379,
+  'elastichache endpoint string',
+  {
+    no_ready_check: true,
+  }
+);
+```
+
+Start app!
+
+#### Stress testing with Redis
+
+##### No Redis
+
+<img src="./photos/1k-RPC-2-Servers-W:O-Cache.png">
+
+##### With Redis
+
+<img src="./photos/1K-RPS-2-Server-With-Cache.png">
+
+Redis added significant improvement in performance.
+
+##### Ramp up to 4 servers and also removal of `New Relic`
+
+<img src="./photos/3K-RPS-4-Servers-With-Cache-No-NewRelic.png">
+
+Best performance currently obtainable.
+
+When I add more servers performance decreases!
+
+8 Servers with Redis Cache
+
+<img src="./photos/3K-RPS-8-Server-With-Cache-No-NewRelic.png">
+<img src="./photos/Nginx-8-Servers.png">
+
+8 Server Architicture
+
+<img src="./photos/AppArchScale.jpg">
+
+Notes
+
+Going to try and add a new instance of Redis to each 4 App servers.
+
+Getting optimal performance at 4 app servers.
+Bottleneck may be Redis when attached to more than 4 servers?
+
+Tried scaling up to 17 servers but still same results.
+<img src="./photos/2.4-RPS-17-Servers.png">
+
+#### Nginx caching
+
+Relevant Docs:
+<https://www.ryadel.com/en/nginx-reverse-proxy-cache-centos-7-linux/>
+
+In `nginx.conf` file
+To access type `vi /etc/nginx/nginx.conf` in terminal
+
+```bash
+
+http {
+
+   upstream roundrobin {
+        server {serverIP}:{port};
+        # e.g. server 127.0.0.1:80
+   }
+
+  proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=9000g inactive=1d;
+
+  proxy_temp_path /var/cache/nginx/tmp;
+  proxy_cache_lock on;
+  proxy_cache_use_stale updating;
+  proxy_cache_valid 200 302 10m;
+  proxy_cache_valid 301 1h;
+  proxy_cache_valid any 1m;
+
+  server {
+    listen       80 default_server;
+    listen       [::]:80 default_server;
+    server_name  _;
+
+    location / {
+       proxy_cache my_cache;
+       proxy_http_version 1.1;
+       proxy_set_header Connection "";
+       add_header X-Cache-Status $upstream_cache_status;
+       add_header X-Handled-By $proxy_host;
+       proxy_pass http://roundrobin;
+    }
+  }
+}
+```
+
+10k-RPS with two servers!!
+
+<img src="./photos/10K-RPS-Cache-NewRelic.png">
