@@ -1,4 +1,4 @@
-const newrelic = require('newrelic');
+// const newrelic = require('newrelic');
 const cluster = require('cluster');
 
 // If the process is the Master Process than fork off n-cores clusters available
