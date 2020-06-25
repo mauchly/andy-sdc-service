@@ -6,7 +6,7 @@ const { client } = require('../../database/redis');
 const setAvgResponse = (finalScore, reviews, reviewNumber) => {
   return `${(finalScore / reviews.length)
     .toFixed(2)
-    .toString()}, (${reviewNumber} reviews)`;
+    .toString()},(${reviewNumber} reviews)`.split(',');
 };
 
 const getAvgScore = (req, res, next) => {
