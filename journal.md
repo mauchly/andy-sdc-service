@@ -1,8 +1,60 @@
 # Engineering Journal SDC Reviews Service
 
+## Table of Contents
+
+- [Engineering Journal SDC Reviews Service](#engineering-journal-sdc-reviews-service)
+  - [Table of Contents](#table-of-contents)
+  - [Phase 1 Scale the DB](#phase-1-scale-the-db)
+    - [MongoDB](#mongodb)
+      - [Support CRUD with MONGO DB](#support-crud-with-mongo-db)
+    - [Postgres](#postgres)
+      - [Sequelize](#sequelize)
+      - [Data Generation/Seeding](#data-generationseeding)
+    - [CouchDB](#couchdb)
+      - [Hello DB](#hello-db)
+      - [Migrate CSV to Couch DB](#migrate-csv-to-couch-db)
+      - [Seed Small Data Set](#seed-small-data-set)
+      - [Seed Large data set](#seed-large-data-set)
+    - [Benchmarking](#benchmarking)
+        - [Postgres Benchmark](#postgres-benchmark)
+      - [CouchDB BenchMark](#couchdb-benchmark)
+    - [Postgres vs CouchDB](#postgres-vs-couchdb)
+      - [Postgres Results](#postgres-results)
+      - [CouchDB Results](#couchdb-results)
+  - [Phase 2 Measure Initial Performance](#phase-2-measure-initial-performance)
+    - [New Relic](#new-relic)
+    - [Artillery](#artillery)
+    - [Clustering Server](#clustering-server)
+    - [Stress Test Single Server](#stress-test-single-server)
+    - [Stress Test Cluster Server](#stress-test-cluster-server)
+    - [Notes](#notes)
+    - [Server Side Rendering Research](#server-side-rendering-research)
+  - [Phase 3: Deploy the Service and Proxy](#phase-3-deploy-the-service-and-proxy)
+    - [AWS](#aws)
+      - [Postgres](#postgres-1)
+        - [Connect](#connect)
+        - [Migrate Data](#migrate-data)
+      - [App Service](#app-service)
+    - [Stress Test (AWS)](#stress-test-aws)
+      - [Loader.io](#loaderio)
+      - [Stress Test Results](#stress-test-results)
+    - [Docker](#docker)
+  - [Phase 4: Scale the Service and Proxy](#phase-4-scale-the-service-and-proxy)
+    - [Nginx Reverse Proxy](#nginx-reverse-proxy)
+      - [Set up](#set-up)
+      - [Load Balancing](#load-balancing)
+      - [Shell Script](#shell-script)
+    - [Stress Test](#stress-test)
+      - [Architecture](#architecture)
+      - [Redis](#redis)
+      - [Stress Test Results](#stress-test-results-1)
+      - [Nginx caching](#nginx-caching)
+
 ## Phase 1 Scale the DB
 
-### Support CRUD with MONGO DB
+### MongoDB
+
+#### Support CRUD with MONGO DB
 
 Refactored database files and Models to use Mongodb atlas
 Set up POST PUT DELETE. GET was already set up from initial code
@@ -10,11 +62,7 @@ Set up POST PUT DELETE. GET was already set up from initial code
 **Observations/Next steps**
 Need to completely refactor to connect to Postgres
 
-### DBMS Selection and Data Generation
-
-- Postgres and CouchDB
-
-### Implementing Postgres
+### Postgres
 
 Set up postgres on local machine.
 Decided to use terminal instead of GUI to manage DB
@@ -23,7 +71,7 @@ _Still unsure if I want to implement Sequelize as will make DB more fluid if nee
 
 _Thinking I should just use Sequelize as it will abstract out schema design and querying using SQL. This may save more time?_
 
-#### Setting up Sequelize
+#### Sequelize
 
 - npm install sequelize pg --save
 
@@ -50,16 +98,16 @@ _Also, unsure if I want to implement Docker now, later or at all? It would be ni
 
 _Decided to just use Postgres and skip Sequelize for now. Adding too much complexity._
 
-#### Connected to Postgres
+**Connection**
 
 - Created connection in database/index.js file
 - Created schemas for listing and reviews tables at database/addTables.js
 
-#### Create Schemas
+**Create Schemas**
 
 - Created schemas and added them to 'addTables.js' file.
 
-#### Data generation and seeding to Postgres
+#### Data Generation/Seeding
 
 Relevant Docs
 
@@ -88,7 +136,7 @@ Listings Query
 COPY listings(id) FROM {csvFile} DELIMITER ',' CSV;'
 ```
 
-### Implementing CouchDB
+### CouchDB
 
 Relevant Docs
 
@@ -119,7 +167,7 @@ Relevant docs
 
 <https://medium.com/codait/simple-csv-import-for-couchdb-71616200b095>
 
-#### Seed small Data set
+#### Seed Small Data Set
 
 - Created small data set `myOutputReviewsSmall.csv` with 1000 entries to test migration.
 - **Added header to CSV** current script does not generate header
@@ -138,9 +186,11 @@ Relevant docs
 
 - Used same script for Large data set and was seeded successfully!
 
-### DBMS Benchmarking PostgreSQL
+### Benchmarking
 
-#### Initial query speeds
+##### Postgres Benchmark
+
+**Initial query speeds**
 
 Query:
 
@@ -233,7 +283,7 @@ Create new review
 
 SUCCESS!!
 
-### DBMS Benchmarking CouchDB
+#### CouchDB BenchMark
 
 GET REQUESTS
 
@@ -248,7 +298,7 @@ Did not notice a significant difference in query speed when query was run multip
 
 ### Postgres vs CouchDB
 
-#### Postgres
+#### Postgres Results
 
 Pros:
 
@@ -262,7 +312,7 @@ Cons:
 - Some parts of the documentation can be dense.
 - Syntax can be quirky
 
-#### CouchDB
+#### CouchDB Results
 
 Pros
 
@@ -276,11 +326,11 @@ Cons
 - Steep learning curve.
 - Low adoption from dev community.
 
-#### Recommendation: POSTGRES
+**Recommendation: POSTGRES**
 
 ## Phase 2 Measure Initial Performance
 
-### Install New Relic
+### New Relic
 
 - Set up account and save `key`
 - Had to rename server.js to app.js because new relic config was looking for app.js
@@ -288,7 +338,7 @@ Cons
 - Updated `.gitignore` to not add `newrelic.js` as it contained newrelic service `key`.
 - New relic dashboard benchmarking `app.js`.
 
-#### Install Artillery
+### Artillery
 
 Relevant Docs: <https://artillery.io/docs/getting-started>
 
@@ -302,7 +352,7 @@ Relevant Docs: <https://artillery.io/docs/getting-started>
   - `duration = 240`
   - `arrivalRate = 1 || 10 || 100 || 1000`
 
-#### Clustering Node js server
+### Clustering Server
 
 Relevant Docs:
 <https://www.youtube.com/watch?v=w1IzRF6AkuI>
@@ -339,53 +389,53 @@ if (cluster.isMaster) {
 
 - Run `node cluster.js` instead of `npm run server-dev` to start cluster server.
 
-#### Stress Test Server with 1, 10, 100, 1000 RPS
+### Stress Test Single Server
 
-#### Single server
-
-##### 1 Request
+**1 Request**
 
 <img src="./photos/1_RPS_ST.png" width="300" >
 
-##### 10 Requests
+**10 Requests**
 
 <img src="./photos/10_RPS_ST.png" width="300">
 
-##### 100 Requests
+**100 Requests**
 
 <img src="./photos/100_RPS_ST.png" width="300">
 
-##### 1000 Requests
+**1000 Requests**
 
 <img src="./photos/1K_RPS_ST.png" width="300">
 
-##### New Relic Dashboard Single Server
+**New Relic Dashboard**
+
+Single Server
 
 <img src="./photos/NR_Dashboard_ST_test.png">
 
-#### Cluster
+### Stress Test Cluster Server
 
-##### 1 Request
+**1 Request**
 
 <img src="./photos/1_RPS_MT.png" width="300">
 
-##### 10 Requests
+**10 Requests**
 
 <img src="./photos/10_RPS_MT.png" width="300">
 
-##### 100 Requests
+**100 Requests**
 
 <img src="./photos/100_RPS_MT.png" width="300">
 
-##### 1000 Requests
+**1000 Requests**
 
 <img src="./photos/1K_RPS_MT_v2a.png" width="300">
 
-##### New Relic Dashboard Cluster
+**New Relic Dashboard Cluster**
 
 <img src="./photos/1k_RPS_MT_v2.png">
 
-#### Notes
+### Notes
 
 Cluster vs Single Core
 
@@ -398,9 +448,9 @@ Further Research
 - Caching pages with Redis
 - Removing dependencies from app to reduce size
 
-#### Server side rendering Research
+### Server Side Rendering Research
 
-##### Server side vs Client side
+**Server side vs Client side**
 
 Server side
 
@@ -449,20 +499,20 @@ Conclusion:
 
 ## Phase 3: Deploy the Service and Proxy
 
-### Preparing app for AWS
+### AWS
 
 Adding env variables
 
 - install dotenv npm package
 - create `.env` file and add variables for port, db info and new relic key
 
-### Postgres on EC2 instance
+#### Postgres
 
 1. Create new EC2 instance
 2. Install Postgres on EC2
 3. Migrate Data from `csv` into EC2 postgres instance
 
-#### Create new EC2 instance
+**Create new EC2 instance**
 
 Relevant Docs:
 
@@ -478,7 +528,7 @@ Relevant Docs:
 - SSH into EC2 instance
   - In EC2 terminal
 
-#### Install and conncet to Postgres
+##### Connect
 
 Relevant Docs:
 <https://www.shubhamdipt.com/blog/postgresql-on-ec2-ubuntu-in-aws/>
@@ -559,7 +609,7 @@ postgres=# GRANT ALL PRIVILEGES ON DATABASE <database_name> TO <user>;​
 - `host` to aws public DNS
 - `user`, `password`, `database` and `port` to match EC2.
 
-#### Migrate CSV Data into EC2 Postgres instance
+##### Migrate Data
 
 1. Migrate csv data from local machine into S3
 
@@ -590,7 +640,7 @@ Notes:
 - Instead chose to migrate data to s3 bucket and then transfer from s3 to EC2.
 - This process was very smooth.
 
-### App Service to EC2 instance
+#### App Service
 
 Relevant docs:
 
@@ -609,9 +659,9 @@ Notes:
 
 - Fairly smooth process
 
-### Stress test Service on AWS
+### Stress Test (AWS)
 
-#### Set up loader.io
+#### Loader.io
 
 Relevant Docs:
 
@@ -627,9 +677,9 @@ Notes:
 - Set up tests for 1, 10, 100, 1K with App and DB running on respective EC2 instances.
 - When setting up tests, input `path` as `%{*:9000000-9100000}` this creates a varialbe that randomly picks a number between 9000000-9100000
 
-#### Initial Stress Test with 1 EC2 Instance
+#### Stress Test Results
 
-Results:
+**1 EC2 Instance**
 
 10 RPS
 
@@ -728,9 +778,13 @@ Had to delete eslint hack reactor package in package.json as well as set `extend
 **Realized that docker is not vital, decided to table it for now**
 **Moving forward with creating a reverse proxy with Nginx**
 
+## Phase 4: Scale the Service and Proxy
+
 ### Nginx Reverse Proxy
 
-#### Set up nginx and connect to single EC2 service instance
+#### Set up
+
+Connect Nginx to single EC2 service instance
 
 Relevant docs:
 <https://www.youtube.com/watch?v=WmdL8aOVooM>
@@ -778,7 +832,9 @@ sudo systemctl start nginx
 
 Proxy now working!
 
-#### Set up load balancing with multiple EC2 service instances
+#### Load Balancing
+
+**Use multiple EC2 service instances**
 
 Create new EC2 instance and pull from git for latest app version.
 
@@ -812,7 +868,9 @@ http {
 }
 ```
 
-##### Set up shell script to automate EC2 set up on creation
+#### Shell Script
+
+**automate EC2 set up on creation**
 
 Relevant Docs
 <https://www.shellscript.sh/>
@@ -853,7 +911,7 @@ pm2 start npm -- start
 
 Add this script `Configure Instance Detains >> Advanced Details >> User Data >> text` upon EC2 launch.
 
-### Stress Test with multiple instances
+### Stress Test
 
 #### Architecture
 
@@ -874,7 +932,7 @@ Next Steps:
 - Add caching with Redis or Nginx (Research pros and cons)
 - Implement Server Side Rendering and cache with Redis
 
-###### Implementing Redis on App
+#### Redis
 
 Relevant docs:
 <https://www.youtube.com/watch?v=oaJq1mQ3dFI>
@@ -884,7 +942,7 @@ Relevant docs:
 - Redis only caches strings so objects from database must be stringified
 - Parse redis data return strings to objects
 
-##### Installing Redis on EC2
+**Installing Redis on EC2**
 
 ```bash
 sudo apt update
@@ -936,19 +994,19 @@ var client = require('redis').createClient(
 
 Start app!
 
-#### Stress testing with Redis
+#### Stress Test Results
 
-##### No Redis
+**No Redis**
 
 <img src="./photos/1k-RPC-2-Servers-W:O-Cache.png">
 
-##### With Redis
+**With Redis**
 
 <img src="./photos/1K-RPS-2-Server-With-Cache.png">
 
 Redis added significant improvement in performance.
 
-##### Ramp up to 4 servers and also removal of `New Relic`
+**Ramp up to 4 servers and also removal of `New Relic`**
 
 <img src="./photos/3K-RPS-4-Servers-With-Cache-No-NewRelic.png">
 
