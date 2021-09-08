@@ -1,4 +1,4 @@
-# FEC: AirBnb Reviews Service
+# FEC: Reviews Service
 
 ## Table of Contents
 
@@ -9,7 +9,7 @@
 
 ## Introduction
 
-> This is the AirBnb Reviews Service. While the service itself is stand-alone, it was built to be part of an entire AirBnb replica listing page. This replica page was built with 3 other individuals and they each handled a particular of the site design. We worked as a team to build and develop these services and were able to bring them together on a single page.
+> This is the Reviews Service. While the service itself is stand-alone, it was built to be part of an entire replica listing page. This replica page was built with 3 other individuals and they each handled a particular of the site design. We worked as a team to build and develop these services and were able to bring them together on a single page.
 
 > I was responsible for the design, implementation and execution of the Reviews Service and making sure it was able to integrate properly with all the other services our team developed.
 
